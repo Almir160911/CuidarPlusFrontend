@@ -5,6 +5,7 @@ import { DashboardPage } from '../../pages/Dashboard/DashboardPage/DashboardPage
 import { ElderlyPage } from '../../pages/Elderly//ElderlyPage'
 import { PlaceholderPage } from '../../pages/Dashboard/PlaceholderPage/PlaceholderPage'
 import { authService } from '../../services/auth.service'
+import { ElderlyRecordPage } from '../../pages/ElderlyRecord/ElderlyRecordPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   if (!authService.isAuthenticated()) {
@@ -36,6 +37,7 @@ export function AppRoutes() {
         <Route path="consultas" element={<PlaceholderPage title="Consultas Médicas" />} />
         <Route path="alertas" element={<PlaceholderPage title="Alertas" />} />
         <Route path="relatorios" element={<PlaceholderPage title="Relatórios" />} />
+        <Route path="idosos/:id" element={<ElderlyRecordPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

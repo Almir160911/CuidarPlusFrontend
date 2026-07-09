@@ -1,4 +1,5 @@
 import { CalendarDays, Eye, HeartPulse, Pill, Stethoscope } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import type { ElderlyPerson } from '../../types/elderly'
 
 interface ElderlyTableProps {
@@ -58,19 +59,39 @@ export function ElderlyTable({ items }: ElderlyTableProps) {
 
               <td className="px-5 py-4">
                 <div className="flex items-center gap-2">
-                  <button title="Visualizar" className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50">
+                  <Link
+                    to={`/idosos/${item.id}`}
+                    title="Abrir prontuário"
+                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                  >
                     <Eye size={16} />
-                  </button>
-                  <button title="Medicamentos" className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50">
+                  </Link>
+
+                  <button
+                    title="Medicamentos"
+                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                  >
                     <Pill size={16} />
                   </button>
-                  <button title="Sinais vitais" className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50">
+
+                  <button
+                    title="Sinais vitais"
+                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                  >
                     <HeartPulse size={16} />
                   </button>
-                  <button title="Consultas" className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50">
+
+                  <button
+                    title="Consultas"
+                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                  >
                     <Stethoscope size={16} />
                   </button>
-                  <button title="Agenda" className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50">
+
+                  <button
+                    title="Agenda"
+                    className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                  >
                     <CalendarDays size={16} />
                   </button>
                 </div>
