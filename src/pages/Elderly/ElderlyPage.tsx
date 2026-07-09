@@ -5,6 +5,8 @@ import { ElderlyLoading } from '../../components/elderly/ElderlyLoading'
 import { ElderlyModal } from '../../components/elderly/ElderlyModal'
 import { ElderlyTable } from '../../components/elderly/ElderlyTable'
 import { ElderlyToolbar } from '../../components/elderly/ElderlyToolbar'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { StatsCard } from '../../components/ui/StatsCard'
 import { useElderly } from '../../hooks/useElderly'
 import type { CreateElderlyPersonRequest } from '../../types/elderly'
 
@@ -28,40 +30,22 @@ export function ElderlyPage() {
     setModalOpen(false)
   }
 
+  const totalWithDoctor = items.filter((item) => item.doctorName).length
+  const totalWithHealthInsurance = items.filter((item) => item.healthInsurance).length
+
   return (
     <div className="space-y-6">
-      <section>
-        <p className="text-sm font-medium text-emerald-700">Cadastro</p>
-        <h1 className="mt-1 text-3xl font-bold text-slate-900">Gestão de Idosos</h1>
-        <p className="mt-2 text-slate-500">
-          Gerencie idosos acompanhados, contatos de emergência, médicos e convênios.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Cadastro"
+        title="Gestão de Idosos"
+        description="Gerencie idosos acompanhados, contatos de emergência, médicos e convênios."
+      />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Total cadastrado</p>
-          <strong className="mt-2 block text-3xl text-slate-900">{totalItems}</strong>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Com médico</p>
-          <strong className="mt-2 block text-3xl text-slate-900">
-            {items.filter((item) => item.doctorName).length}
-          </strong>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Com convênio</p>
-          <strong className="mt-2 block text-3xl text-slate-900">
-            {items.filter((item) => item.healthInsurance).length}
-          </strong>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Alertas ativos</p>
-          <strong className="mt-2 block text-3xl text-slate-900">0</strong>
-        </div>
+        <StatsCard label="Total cadastrado" value={totalItems} />
+        <StatsCard label="Com médico" value={totalWithDoctor} />
+        <StatsCard label="Com convênio" value={totalWithHealthInsurance} />
+        <StatsCard label="Alertas ativos" value={0} />
       </section>
 
       {error && (
