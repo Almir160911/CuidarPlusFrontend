@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '../../layouts/AppLayout/AppLayout'
 import { LoginPage } from '../../pages/Login/LoginPage/LoginPage'
 import { DashboardPage } from '../../pages/Dashboard/DashboardPage/DashboardPage'
-import { ElderlyPage } from '../../pages/Elderly/ElderlyPage/ElderlyPage'
+import { ElderlyPage } from '../../pages/Elderly//ElderlyPage'
 import { PlaceholderPage } from '../../pages/Dashboard/PlaceholderPage/PlaceholderPage'
 import { authService } from '../../services/auth.service'
 
