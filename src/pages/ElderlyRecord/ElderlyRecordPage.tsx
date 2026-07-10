@@ -20,6 +20,7 @@ import { LoadingList } from '../../components/ui/LoadingList'
 import { StatsCard } from '../../components/ui/StatsCard'
 import { dashboardService } from '../../services/dashboard.service'
 import type { ElderlyDashboard } from '../../types/elderly-dashboard'
+import { MedicationSchedulePanel } from '../../components/elderly-record/MedicationSchedulePanel'
 
 type RecordTab =
   | 'summary'
@@ -661,10 +662,8 @@ export function ElderlyRecordPage() {
       )}
 
       {activeTab === 'schedule' && (
-        <PlaceholderPanel
-          title="Agenda de Medicamentos"
-          description="Aqui serão exibidos os horários de administração, confirmações e medicamentos não administrados."
-          icon={<CalendarDays size={32} />}
+        <MedicationSchedulePanel
+          elderlyPersonId={dashboard.elderlyPersonId}
         />
       )}
 
