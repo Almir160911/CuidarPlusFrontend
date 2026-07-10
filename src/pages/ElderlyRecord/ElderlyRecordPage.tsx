@@ -17,6 +17,7 @@ import { LoadingList } from '../../components/ui/LoadingList'
 import { StatsCard } from '../../components/ui/StatsCard'
 import { dashboardService } from '../../services/dashboard.service'
 import type { ElderlyDashboard } from '../../types/elderly-dashboard'
+import { MedicationPanel } from '../../components/elderly-record/MedicationPanel'
 
 interface ModuleCardProps {
   title: string
@@ -309,7 +310,6 @@ export function ElderlyRecordPage() {
           )}
         </Card>
       </section>
-
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <ModuleCard
           title="Medicamentos"
@@ -367,9 +367,12 @@ export function ElderlyRecordPage() {
         />
       </section>
 
+      <MedicationPanel elderlyPersonId={dashboard.elderlyPersonId} />
+
       <Card className="p-6">
         <div className="flex items-center gap-3">
           <ClipboardList className="text-emerald-700" />
+
           <h2 className="text-lg font-bold text-slate-900">
             Timeline recente
           </h2>
@@ -388,7 +391,9 @@ export function ElderlyRecordPage() {
               >
                 <div className="absolute -left-[7px] top-1 h-3 w-3 rounded-full bg-emerald-600" />
 
-                <p className="font-semibold text-slate-900">{event.title}</p>
+                <p className="font-semibold text-slate-900">
+                  {event.title}
+                </p>
 
                 {event.description && (
                   <p className="mt-1 text-sm text-slate-500">
