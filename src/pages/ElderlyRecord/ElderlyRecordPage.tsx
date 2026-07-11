@@ -21,6 +21,8 @@ import { StatsCard } from '../../components/ui/StatsCard'
 import { dashboardService } from '../../services/dashboard.service'
 import type { ElderlyDashboard } from '../../types/elderly-dashboard'
 import { MedicationSchedulePanel } from '../../components/elderly-record/MedicationSchedulePanel'
+import { MedicalAppointmentPanel } from '../../components/elderly-record/MedicalAppointmentPanel'
+import { VitalSignPanel } from '../../components/elderly-record/VitalSignPanel'
 
 type RecordTab =
   | 'summary'
@@ -668,18 +670,14 @@ export function ElderlyRecordPage() {
       )}
 
       {activeTab === 'appointments' && (
-        <PlaceholderPanel
-          title="Consultas Médicas"
-          description="Aqui serão exibidas as consultas futuras, o histórico médico, profissionais e especialidades."
-          icon={<Stethoscope size={32} />}
+        <MedicalAppointmentPanel
+          elderlyPersonId={dashboard.elderlyPersonId}
         />
       )}
 
       {activeTab === 'vital-signs' && (
-        <PlaceholderPanel
-          title="Sinais Vitais"
-          description="Aqui serão registrados e analisados pressão arterial, glicemia, temperatura, frequência cardíaca e saturação."
-          icon={<HeartPulse size={32} />}
+        <VitalSignPanel
+          elderlyPersonId={dashboard.elderlyPersonId}
         />
       )}
 
