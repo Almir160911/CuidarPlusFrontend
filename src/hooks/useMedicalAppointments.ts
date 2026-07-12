@@ -1,22 +1,40 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { medicalAppointmentService } from '../services/medical-appointment.service'
 import type {
   CreateMedicalAppointmentRequest,
   MedicalAppointment,
 } from '../types/medical-appointment'
 
+const DEFAULT_PAGE_SIZE = 20
+
 export function useMedicalAppointments(
   elderlyPersonId?: string,
 ) {
   const [items, setItems] = useState<MedicalAppointment[]>([])
+  const [selected, setSelected] =
+    useState<MedicalAppointment | null>(null)
+
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] =
+    useState(DEFAULT_PAGE_SIZE)
+  const [totalItems, setTotalItems] = useState(0)
+
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [detailsLoading, setDetailsLoading] =
+    useState(false)
   const [error, setError] = useState('')
 
   const load = useCallback(async () => {
     if (!elderlyPersonId) {
       setItems([])
+      setTotalItems(0)
       return
     }
 
@@ -25,21 +43,32 @@ export function useMedicalAppointments(
 
     try {
       const result =
-        await medicalAppointmentService.listByElderly({
+        await medicalAppointmentService.listByElderly(
           elderlyPersonId,
-          page: 1,
-          pageSize: 100,
-          search,
-        })
+          {
+            page,
+            pageSize,
+            search,
+          },
+        )
 
       setItems(result.items)
+      setTotalItems(result.totalItems)
     } catch {
       setItems([])
-      setError('Não foi possível carregar as consultas.')
+      setTotalItems(0)
+      setError(
+        'Não foi possível carregar as consultas médicas.',
+      )
     } finally {
       setLoading(false)
     }
-  }, [elderlyPersonId, search])
+  }, [
+    elderlyPersonId,
+    page,
+    pageSize,
+    search,
+  ])
 
   async function create(
     payload: CreateMedicalAppointmentRequest,
@@ -48,45 +77,99 @@ export function useMedicalAppointments(
     setError('')
 
     try {
-      await medicalAppointmentService.create(payload)
+      const appointment =
+        await medicalAppointmentService.create(payload)
+
       await load()
+
+      return appointment
     } catch {
-      setError('Não foi possível cadastrar a consulta.')
-      throw new Error('Erro ao cadastrar consulta.')
+      setError(
+        'Não foi possível cadastrar a consulta médica.',
+      )
+
+      throw new Error(
+        'Erro ao cadastrar consulta médica.',
+      )
     } finally {
       setSaving(false)
     }
   }
 
-  const upcomingAppointments = useMemo(() => {
-    const now = new Date()
+  async function loadDetails(id: string) {
+    setDetailsLoading(true)
+    setError('')
 
-    return items
-      .filter(
-        (appointment) =>
-          new Date(appointment.appointmentDate) >= now,
+    try {
+      const appointment =
+        await medicalAppointmentService.getById(id)
+
+      setSelected(appointment)
+
+      return appointment
+    } catch {
+      setError(
+        'Não foi possível carregar os detalhes da consulta.',
       )
-      .sort(
-        (a, b) =>
-          new Date(a.appointmentDate).getTime() -
-          new Date(b.appointmentDate).getTime(),
-      )
+
+      return null
+    } finally {
+      setDetailsLoading(false)
+    }
+  }
+
+  function clearSelected() {
+    setSelected(null)
+  }
+
+  function changeSearch(value: string) {
+    setSearch(value)
+    setPage(1)
+  }
+
+  function changePageSize(value: number) {
+    setPageSize(value)
+    setPage(1)
+  }
+
+  const sortedItems = useMemo(() => {
+    return [...items].sort(
+      (a, b) =>
+        new Date(a.appointmentDate).getTime() -
+        new Date(b.appointmentDate).getTime(),
+    )
   }, [items])
+
+  const upcomingAppointments = useMemo(() => {
+    const now = Date.now()
+
+    return sortedItems.filter(
+      (appointment) =>
+        new Date(appointment.appointmentDate).getTime() >=
+        now,
+    )
+  }, [sortedItems])
 
   const pastAppointments = useMemo(() => {
-    const now = new Date()
+    const now = Date.now()
 
-    return items
+    return sortedItems
       .filter(
         (appointment) =>
-          new Date(appointment.appointmentDate) < now,
+          new Date(
+            appointment.appointmentDate,
+          ).getTime() < now,
       )
-      .sort(
-        (a, b) =>
-          new Date(b.appointmentDate).getTime() -
-          new Date(a.appointmentDate).getTime(),
-      )
-  }, [items])
+      .reverse()
+  }, [sortedItems])
+
+  const nextAppointment =
+    upcomingAppointments[0] ?? null
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / pageSize),
+  )
 
   useEffect(() => {
     load()
@@ -94,14 +177,30 @@ export function useMedicalAppointments(
 
   return {
     items,
+    selected,
     upcomingAppointments,
     pastAppointments,
+    nextAppointment,
+
     search,
+    page,
+    pageSize,
+    totalItems,
+    totalPages,
+
     loading,
     saving,
+    detailsLoading,
     error,
-    setSearch,
+
+    setPage,
+    setSelected,
+    changeSearch,
+    changePageSize,
+    clearSelected,
+
     load,
     create,
+    loadDetails,
   }
 }

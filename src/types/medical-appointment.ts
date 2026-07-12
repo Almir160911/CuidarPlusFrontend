@@ -21,8 +21,7 @@ export interface CreateMedicalAppointmentRequest {
   notes?: string
 }
 
-export interface MedicalAppointmentListParams {
-  elderlyPersonId: string
+export interface MedicalAppointmentFilters {
   page?: number
   pageSize?: number
   search?: string
@@ -36,4 +35,6 @@ export interface MedicalAppointmentListParams {
 export interface MedicalAppointmentListResult {
   items: MedicalAppointment[]
   totalItems: number
+  page: number
+  pageSize: number
 }

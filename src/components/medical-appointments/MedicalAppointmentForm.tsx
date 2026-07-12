@@ -58,14 +58,21 @@ export function MedicalAppointmentForm({
       return
     }
 
+    const appointmentDate = new Date(
+      form.appointmentDate,
+    )
+
+    if (Number.isNaN(appointmentDate.getTime())) {
+      setError('A data da consulta é inválida.')
+      return
+    }
+
     await onSubmit({
       elderlyPersonId,
       title: form.title.trim(),
       doctorName: form.doctorName.trim() || undefined,
       specialty: form.specialty.trim() || undefined,
-      appointmentDate: new Date(
-        form.appointmentDate,
-      ).toISOString(),
+      appointmentDate: appointmentDate.toISOString(),
       location: form.location.trim() || undefined,
       notes: form.notes.trim() || undefined,
     })
@@ -145,8 +152,8 @@ export function MedicalAppointmentForm({
         </span>
 
         <input
-          type="datetime-local"
           required
+          type="datetime-local"
           value={form.appointmentDate}
           onChange={(event) =>
             setForm((current) => ({
