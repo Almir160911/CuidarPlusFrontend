@@ -24,6 +24,7 @@ import { MedicationSchedulePanel } from '../../components/elderly-record/Medicat
 import { MedicalAppointmentPanel } from '../../components/elderly-record/MedicalAppointmentPanel'
 import { VitalSignPanel } from '../../components/elderly-record/VitalSignPanel'
 import { CareLogPanel } from '../../components/elderly-record/CareLogPanel'
+import { DocumentPanel } from '../../components/elderly-record/DocumentPanel'
 
 type RecordTab =
   | 'summary'
@@ -689,10 +690,8 @@ export function ElderlyRecordPage() {
       )}
 
       {activeTab === 'documents' && (
-        <PlaceholderPanel
-          title="Documentos"
-          description="Aqui serão armazenados receitas, exames, documentos pessoais, termos e outros anexos."
-          icon={<FolderOpen size={32} />}
+        <DocumentPanel
+          elderlyPersonId={dashboard.elderlyPersonId}
         />
       )}
 
