@@ -23,6 +23,7 @@ import type { ElderlyDashboard } from '../../types/elderly-dashboard'
 import { MedicationSchedulePanel } from '../../components/elderly-record/MedicationSchedulePanel'
 import { MedicalAppointmentPanel } from '../../components/elderly-record/MedicalAppointmentPanel'
 import { VitalSignPanel } from '../../components/elderly-record/VitalSignPanel'
+import { CareLogPanel } from '../../components/elderly-record/CareLogPanel'
 
 type RecordTab =
   | 'summary'
@@ -682,10 +683,8 @@ export function ElderlyRecordPage() {
       )}
 
       {activeTab === 'care-logs' && (
-        <PlaceholderPanel
-          title="Diário de Cuidados"
-          description="Aqui serão registrados alimentação, banho, sono, humor, dor, quedas e observações."
-          icon={<ClipboardList size={32} />}
+        <CareLogPanel
+          elderlyPersonId={dashboard.elderlyPersonId}
         />
       )}
 
