@@ -67,10 +67,6 @@ function normalizeList(
   }
 }
 
-function normalizeAlert(value: unknown): Alert {
-  return unwrapData(value) as Alert
-}
-
 export const alertService = {
   async listByElderly(
     params: AlertListParams,
@@ -98,11 +94,8 @@ export const alertService = {
     )
   },
 
-  async markAsRead(id: string): Promise<Alert> {
-    const response = await api.patch(
-      `/api/alerts/${id}/read`,
-    )
+    async markAsRead(id: string): Promise<void> {
+    await api.patch(`/api/alerts/${id}/read`)
+    },
 
-    return normalizeAlert(response.data)
-  },
 }
