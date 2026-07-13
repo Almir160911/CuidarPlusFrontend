@@ -25,6 +25,7 @@ import { MedicalAppointmentPanel } from '../../components/elderly-record/Medical
 import { VitalSignPanel } from '../../components/elderly-record/VitalSignPanel'
 import { CareLogPanel } from '../../components/elderly-record/CareLogPanel'
 import { DocumentPanel } from '../../components/elderly-record/DocumentPanel'
+import { AlertPanel } from '../../components/elderly-record/AlertPanel'
 
 type RecordTab =
   | 'summary'
@@ -36,6 +37,7 @@ type RecordTab =
   | 'documents'
   | 'timeline'
   | 'reports'
+  | 'alerts'
 
 interface TabDefinition {
   id: RecordTab
@@ -532,6 +534,12 @@ export function ElderlyRecordPage() {
       badge: dashboard.careLogsCount,
     },
     {
+      id: 'alerts',
+      label: 'Alertas',
+      icon: <AlertTriangle size={18} />,
+      badge: dashboard.unreadAlerts,
+    },
+    {
       id: 'documents',
       label: 'Documentos',
       icon: <FolderOpen size={18} />,
@@ -688,7 +696,12 @@ export function ElderlyRecordPage() {
           elderlyPersonId={dashboard.elderlyPersonId}
         />
       )}
-
+      {activeTab === 'alerts' && (
+        <AlertPanel
+          elderlyPersonId={dashboard.elderlyPersonId}
+        />
+      )}
+      
       {activeTab === 'documents' && (
         <DocumentPanel
           elderlyPersonId={dashboard.elderlyPersonId}

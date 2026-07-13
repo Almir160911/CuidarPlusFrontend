@@ -6,7 +6,32 @@ import type {
   MedicationScheduleListResult,
 } from '../types/medication-schedule'
 
-function normalizeList(data: unknown): MedicationScheduleListResult {
+interface ApiEnvelope<T> {
+  success?: boolean
+  message?: string
+  data?: T
+}
+
+interface ApiPagedResponse<T> {
+  items?: T[]
+  totalItems?: number
+}
+
+function unwrapData(data: unknown): unknown {
+  if (!data || typeof data !== 'object') {
+    return data
+  }
+
+  const envelope = data as ApiEnvelope<unknown>
+
+  return envelope.data ?? data
+}
+
+function normalizeList(
+  responseData: unknown,
+): MedicationScheduleListResult {
+  const data = unwrapData(responseData)
+
   if (Array.isArray(data)) {
     return {
       items: data as MedicationSchedule[],
@@ -14,35 +39,30 @@ function normalizeList(data: unknown): MedicationScheduleListResult {
     }
   }
 
-  if (data && typeof data === 'object') {
-    const obj = data as Record<string, unknown>
-
-    const items =
-      Array.isArray(obj.items)
-        ? obj.items
-        : Array.isArray(obj.data)
-          ? obj.data
-          : Array.isArray(obj.results)
-            ? obj.results
-            : []
-
-    const totalItems =
-      typeof obj.totalItems === 'number'
-        ? obj.totalItems
-        : typeof obj.total === 'number'
-          ? obj.total
-          : items.length
-
+  if (!data || typeof data !== 'object') {
     return {
-      items: items as MedicationSchedule[],
-      totalItems,
+      items: [],
+      totalItems: 0,
     }
   }
 
+  const response = data as ApiPagedResponse<MedicationSchedule>
+  const items = Array.isArray(response.items)
+    ? response.items
+    : []
+
   return {
-    items: [],
-    totalItems: 0,
+    items,
+    totalItems: response.totalItems ?? items.length,
   }
+}
+
+function normalizeSchedule(
+  responseData: unknown,
+): MedicationSchedule {
+  const data = unwrapData(responseData)
+
+  return data as MedicationSchedule
 }
 
 export const medicationScheduleService = {
@@ -65,35 +85,35 @@ export const medicationScheduleService = {
   async create(
     payload: CreateMedicationScheduleRequest,
   ): Promise<MedicationSchedule> {
-    const response = await api.post<MedicationSchedule>(
+    const response = await api.post(
       '/api/medication-schedules',
       payload,
     )
 
-    return response.data
+    return normalizeSchedule(response.data)
   },
 
   async confirmTaken(
     id: string,
     payload: ConfirmMedicationScheduleRequest,
   ): Promise<MedicationSchedule> {
-    const response = await api.patch<MedicationSchedule>(
+    const response = await api.patch(
       `/api/medication-schedules/${id}/taken`,
       payload,
     )
 
-    return response.data
+    return normalizeSchedule(response.data)
   },
 
   async confirmNotTaken(
     id: string,
     payload: ConfirmMedicationScheduleRequest,
   ): Promise<MedicationSchedule> {
-    const response = await api.patch<MedicationSchedule>(
+    const response = await api.patch(
       `/api/medication-schedules/${id}/not-taken`,
       payload,
     )
 
-    return response.data
+    return normalizeSchedule(response.data)
   },
 }
