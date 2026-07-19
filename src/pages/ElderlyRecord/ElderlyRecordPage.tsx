@@ -26,8 +26,10 @@ import { VitalSignPanel } from '../../components/elderly-record/VitalSignPanel'
 import { CareLogPanel } from '../../components/elderly-record/CareLogPanel'
 import { DocumentPanel } from '../../components/elderly-record/DocumentPanel'
 import { AlertPanel } from '../../components/elderly-record/AlertPanel'
+import { DailyAgendaPanel } from '../../components/elderly-record/DailyAgendaPanel'
 
 type RecordTab =
+  | 'daily-agenda'
   | 'summary'
   | 'medications'
   | 'schedule'
@@ -452,7 +454,7 @@ export function ElderlyRecordPage() {
     useState<ElderlyDashboard | null>(null)
 
   const [activeTab, setActiveTab] =
-    useState<RecordTab>('summary')
+    useState<RecordTab>('daily-agenda')
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -498,6 +500,11 @@ export function ElderlyRecordPage() {
   }
 
   const tabs: TabDefinition[] = [
+    {
+      id: 'daily-agenda',
+      label: 'Agenda diária',
+      icon: <CalendarDays size={18} />,
+    },
     {
       id: 'summary',
       label: 'Resumo',
@@ -663,6 +670,12 @@ export function ElderlyRecordPage() {
         </nav>
       </div>
 
+      {activeTab === 'daily-agenda' && (
+        <DailyAgendaPanel
+          elderlyPersonId={dashboard.elderlyPersonId}
+        />
+      )}
+
       {activeTab === 'summary' && (
         <SummaryTab dashboard={dashboard} />
       )}
@@ -701,7 +714,7 @@ export function ElderlyRecordPage() {
           elderlyPersonId={dashboard.elderlyPersonId}
         />
       )}
-      
+
       {activeTab === 'documents' && (
         <DocumentPanel
           elderlyPersonId={dashboard.elderlyPersonId}
