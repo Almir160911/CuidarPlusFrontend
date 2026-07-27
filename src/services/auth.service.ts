@@ -51,6 +51,27 @@ interface ApiEnvelope<T> {
   errors?: string[];
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface PasswordRecoveryResult {
+  message: string;
+}
+
+interface EmptyResponse {
+  success?: boolean;
+  message?: string;
+  data?: unknown;
+  errors?: string[];
+}
 
 
 const TOKEN_KEY = 'cuidarplus_token';

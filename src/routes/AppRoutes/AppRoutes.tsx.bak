@@ -36,7 +36,22 @@ export function AppRoutes() {
         element={<LoginPage />}
       />
 
-<Route
+      <Route
+        path="/esqueci-minha-senha"
+        element={<ForgotPasswordPage />}
+      />
+
+      <Route
+        path="/redefinir-senha"
+        element={<ResetPasswordPage />}
+      />
+
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
+      />
+
+      <Route
         path="/"
         element={
           <PrivateRoute>
