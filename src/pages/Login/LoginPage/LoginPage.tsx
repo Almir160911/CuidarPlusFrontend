@@ -1,117 +1,216 @@
-import { Activity, Loader2 } from 'lucide-react'
-import { useState } from 'react'
-import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { authService } from '../../../services/auth.service'
+import {
+  type FormEvent,
+  useState,
+} from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Eye,
+  EyeOff,
+  HeartPulse,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+} from 'lucide-react';
 
-export function LoginPage() {
-  const navigate = useNavigate()
+import authService from '../../../services/auth.service';
 
-  const [email, setEmail] = useState('admin@cuidarplus.com')
-  const [password, setPassword] = useState('123456')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+export default function LoginPage() {
+  const navigate = useNavigate();
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault()
-    setError('')
-    setLoading(true)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] =
+    useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(
+    null,
+  );
+
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
+    const normalizedEmail = email.trim();
+
+    if (!normalizedEmail) {
+      setError('Informe o e-mail.');
+      return;
+    }
+
+    if (!password) {
+      setError('Informe a senha.');
+      return;
+    }
 
     try {
-      const result = await authService.login({ email, password })
+      setLoading(true);
+      setError(null);
 
-      const token = result.token || result.accessToken || result.jwt
+      await authService.login({
+        email: normalizedEmail,
+        password,
+      });
 
-      if (!token) {
-        throw new Error('Token JWT não retornado pela API.')
-      }
+      /*
+       * O token já foi salvo pelo authService.
+       * Não tente acessar result.data.token aqui.
+       */
+      navigate('/', {
+        replace: true,
+      });
+    } catch (loginError) {
+      const message =
+        loginError instanceof Error
+          ? loginError.message
+          : 'Não foi possível realizar o login.';
 
-      localStorage.setItem('cuidarplus_token', token)
-      localStorage.setItem('cuidarplus_user', JSON.stringify(result.user ?? result))
-
-      navigate('/')
-    } catch {
-      setError('Não foi possível entrar. Verifique o e-mail, senha ou se a API está rodando.')
+      setError(message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <main className="grid min-h-screen grid-cols-1 bg-slate-950 lg:grid-cols-2">
-      <section className="hidden bg-gradient-to-br from-emerald-500 via-teal-600 to-slate-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
-            <Activity />
+    <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-10">
+      <section className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/60">
+        <header className="mb-8 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
+            <HeartPulse
+              className="text-emerald-700"
+              size={34}
+            />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">Cuidar+</h1>
-            <p className="text-sm text-emerald-50">Plataforma inteligente de cuidados</p>
-          </div>
-        </div>
 
-        <div>
-          <h2 className="max-w-xl text-5xl font-bold leading-tight">
-            Gestão moderna para idosos, cuidadores, medicamentos e alertas.
-          </h2>
-          <p className="mt-6 max-w-lg text-lg text-emerald-50">
-            Centralize cuidados, consultas, sinais vitais e registros diários em uma única plataforma.
+          <h1 className="mt-5 text-3xl font-bold text-slate-900">
+            Cuidar+
+          </h1>
+
+          <p className="mt-2 text-sm text-slate-500">
+            Acesse sua conta para continuar
           </p>
-        </div>
+        </header>
 
-        <p className="text-sm text-emerald-50">© Cuidar+ — Portal Administrativo</p>
-      </section>
-
-      <section className="flex items-center justify-center px-6 py-12">
         <form
+          className="space-y-5"
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-3xl border border-white/10 bg-white p-8 shadow-2xl"
         >
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white">
-              <Activity />
+          <div>
+            <label
+              className="mb-2 block text-sm font-semibold text-slate-700"
+              htmlFor="email"
+            >
+              E-mail
+            </label>
+
+            <div className="relative">
+              <Mail
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={19}
+              />
+
+              <input
+                autoComplete="email"
+                className="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-4 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 disabled:bg-slate-100"
+                disabled={loading}
+                id="email"
+                name="email"
+                onChange={(event) =>
+                  setEmail(event.target.value)
+                }
+                placeholder="seu@email.com"
+                type="email"
+                value={email}
+              />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900">Entrar no Cuidar+</h1>
-            <p className="mt-2 text-sm text-slate-500">Acesse o painel administrativo</p>
+          </div>
+
+          <div>
+            <label
+              className="mb-2 block text-sm font-semibold text-slate-700"
+              htmlFor="password"
+            >
+              Senha
+            </label>
+
+            <div className="relative">
+              <LockKeyhole
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={19}
+              />
+
+              <input
+                autoComplete="current-password"
+                className="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-12 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 disabled:bg-slate-100"
+                disabled={loading}
+                id="password"
+                name="password"
+                onChange={(event) =>
+                  setPassword(event.target.value)
+                }
+                placeholder="Digite sua senha"
+                type={
+                  showPassword
+                    ? 'text'
+                    : 'password'
+                }
+                value={password}
+              />
+
+              <button
+                aria-label={
+                  showPassword
+                    ? 'Ocultar senha'
+                    : 'Mostrar senha'
+                }
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                onClick={() =>
+                  setShowPassword(
+                    (current) => !current,
+                  )
+                }
+                type="button"
+              >
+                {showPassword ? (
+                  <EyeOff size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </button>
+            </div>
           </div>
 
           {error && (
-            <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div
+              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
-          <div className="space-y-4">
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-slate-700">E-mail</span>
-              <input
-                type="email"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-1 block text-sm font-medium text-slate-700">Senha</span>
-              <input
-                type="password"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </label>
-          </div>
-
           <button
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={loading}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+            type="submit"
           >
-            {loading && <Loader2 className="animate-spin" size={18} />}
-            Entrar
+            {loading && (
+              <LoaderCircle
+                className="animate-spin"
+                size={19}
+              />
+            )}
+
+            {loading
+              ? 'Entrando...'
+              : 'Entrar'}
           </button>
         </form>
       </section>
     </main>
-  )
+  );
 }
