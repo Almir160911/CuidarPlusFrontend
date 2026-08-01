@@ -22,7 +22,7 @@ export const dailyAgendaService = {
     const formattedDate = formatDateForApi(date)
 
     const response = await api.get<ApiResponse<DailyAgenda>>(
-      `/daily-agenda/elderly/${elderlyPersonId}`,
+      `/api/daily-agenda/elderly/${elderlyPersonId}`,
       {
         params: {
           date: formattedDate,

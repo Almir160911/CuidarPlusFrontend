@@ -6,10 +6,14 @@ import type {
   MedicalAppointmentListResult,
 } from '../types/medical-appointment'
 
+interface ApiEnvelope<T> {
+  success?: boolean
+  message?: string
+  data?: T
+}
+
 interface ApiPagedResponse<T> {
   items?: T[]
-  data?: T[]
-  results?: T[]
   totalItems?: number
   total?: number
   page?: number
@@ -17,11 +21,23 @@ interface ApiPagedResponse<T> {
   pageSize?: number
 }
 
+function unwrapData(data: unknown): unknown {
+  if (!data || typeof data !== 'object') {
+    return data
+  }
+
+  const envelope = data as ApiEnvelope<unknown>
+
+  return envelope.data ?? data
+}
+
 function normalizeListResponse(
-  data: unknown,
+  responseData: unknown,
   requestedPage: number,
   requestedPageSize: number,
 ): MedicalAppointmentListResult {
+  const data = unwrapData(responseData)
+
   if (Array.isArray(data)) {
     return {
       items: data as MedicalAppointment[],
@@ -40,13 +56,12 @@ function normalizeListResponse(
     }
   }
 
-  const response = data as ApiPagedResponse<MedicalAppointment>
+  const response =
+    data as ApiPagedResponse<MedicalAppointment>
 
-  const items =
-    response.items ??
-    response.data ??
-    response.results ??
-    []
+  const items = Array.isArray(response.items)
+    ? response.items
+    : []
 
   return {
     items,
@@ -62,6 +77,14 @@ function normalizeListResponse(
       response.pageSize ??
       requestedPageSize,
   }
+}
+
+function normalizeAppointmentResponse(
+  responseData: unknown,
+): MedicalAppointment {
+  const data = unwrapData(responseData)
+
+  return data as MedicalAppointment
 }
 
 export const medicalAppointmentService = {
@@ -81,9 +104,12 @@ export const medicalAppointmentService = {
           Search: filters.search?.trim() || undefined,
           FromDate: filters.fromDate || undefined,
           ToDate: filters.toDate || undefined,
-          DoctorName: filters.doctorName?.trim() || undefined,
-          Specialty: filters.specialty?.trim() || undefined,
-          Location: filters.location?.trim() || undefined,
+          DoctorName:
+            filters.doctorName?.trim() || undefined,
+          Specialty:
+            filters.specialty?.trim() || undefined,
+          Location:
+            filters.location?.trim() || undefined,
         },
       },
     )
@@ -98,21 +124,25 @@ export const medicalAppointmentService = {
   async getById(
     id: string,
   ): Promise<MedicalAppointment> {
-    const response = await api.get<MedicalAppointment>(
+    const response = await api.get(
       `/api/medical-appointments/${id}`,
     )
 
-    return response.data
+    return normalizeAppointmentResponse(
+      response.data,
+    )
   },
 
   async create(
     payload: CreateMedicalAppointmentRequest,
   ): Promise<MedicalAppointment> {
-    const response = await api.post<MedicalAppointment>(
+    const response = await api.post(
       '/api/medical-appointments',
       payload,
     )
 
-    return response.data
+    return normalizeAppointmentResponse(
+      response.data,
+    )
   },
 }

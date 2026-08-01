@@ -6,10 +6,14 @@ import type {
   CreateCareLogRequest,
 } from '../types/care-log'
 
+interface ApiEnvelope<T> {
+  success?: boolean
+  message?: string
+  data?: T
+}
+
 interface ApiPagedResponse<T> {
   items?: T[]
-  data?: T[]
-  results?: T[]
   totalItems?: number
   total?: number
   page?: number
@@ -17,11 +21,23 @@ interface ApiPagedResponse<T> {
   pageSize?: number
 }
 
+function unwrapData(data: unknown): unknown {
+  if (!data || typeof data !== 'object') {
+    return data
+  }
+
+  const envelope = data as ApiEnvelope<unknown>
+
+  return envelope.data ?? data
+}
+
 function normalizeListResponse(
-  data: unknown,
+  responseData: unknown,
   requestedPage: number,
   requestedPageSize: number,
 ): CareLogListResult {
+  const data = unwrapData(responseData)
+
   if (Array.isArray(data)) {
     return {
       items: data as CareLog[],
@@ -40,13 +56,12 @@ function normalizeListResponse(
     }
   }
 
-  const response = data as ApiPagedResponse<CareLog>
+  const response =
+    data as ApiPagedResponse<CareLog>
 
-  const items =
-    response.items ??
-    response.data ??
-    response.results ??
-    []
+  const items = Array.isArray(response.items)
+    ? response.items
+    : []
 
   return {
     items,
@@ -62,6 +77,14 @@ function normalizeListResponse(
       response.pageSize ??
       requestedPageSize,
   }
+}
+
+function normalizeCareLogResponse(
+  responseData: unknown,
+): CareLog {
+  const data = unwrapData(responseData)
+
+  return data as CareLog
 }
 
 export const careLogService = {
@@ -98,11 +121,13 @@ export const careLogService = {
   async create(
     payload: CreateCareLogRequest,
   ): Promise<CareLog> {
-    const response = await api.post<CareLog>(
+    const response = await api.post(
       '/api/care-logs',
       payload,
     )
 
-    return response.data
+    return normalizeCareLogResponse(
+      response.data,
+    )
   },
 }

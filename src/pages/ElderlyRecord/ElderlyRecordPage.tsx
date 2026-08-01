@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import {
+  Link,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom'
 import {
   AlertTriangle,
   ArrowLeft,
@@ -14,19 +18,23 @@ import {
   Stethoscope,
   UserRound,
 } from 'lucide-react'
+
+import { AlertPanel } from '../../components/elderly-record/AlertPanel'
+import { CareLogPanel } from '../../components/elderly-record/CareLogPanel'
+import { DailyAgendaPanel } from '../../components/elderly-record/DailyAgendaPanel'
+import { DocumentPanel } from '../../components/elderly-record/DocumentPanel'
+import { MedicalAppointmentPanel } from '../../components/elderly-record/MedicalAppointmentPanel'
 import { MedicationPanel } from '../../components/elderly-record/MedicationPanel'
+import { MedicationSchedulePanel } from '../../components/elderly-record/MedicationSchedulePanel'
+import { VitalSignPanel } from '../../components/elderly-record/VitalSignPanel'
+
 import { Card } from '../../components/ui/Card'
 import { LoadingList } from '../../components/ui/LoadingList'
 import { StatsCard } from '../../components/ui/StatsCard'
+
 import { dashboardService } from '../../services/dashboard.service'
 import type { ElderlyDashboard } from '../../types/elderly-dashboard'
-import { MedicationSchedulePanel } from '../../components/elderly-record/MedicationSchedulePanel'
-import { MedicalAppointmentPanel } from '../../components/elderly-record/MedicalAppointmentPanel'
-import { VitalSignPanel } from '../../components/elderly-record/VitalSignPanel'
-import { CareLogPanel } from '../../components/elderly-record/CareLogPanel'
-import { DocumentPanel } from '../../components/elderly-record/DocumentPanel'
-import { AlertPanel } from '../../components/elderly-record/AlertPanel'
-import { DailyAgendaPanel } from '../../components/elderly-record/DailyAgendaPanel'
+import { ReportPanel } from '../../components/elderly-record/ReportPanel'
 
 type RecordTab =
   | 'daily-agenda'
@@ -36,10 +44,10 @@ type RecordTab =
   | 'appointments'
   | 'vital-signs'
   | 'care-logs'
+  | 'alerts'
   | 'documents'
   | 'timeline'
   | 'reports'
-  | 'alerts'
 
 interface TabDefinition {
   id: RecordTab
@@ -48,44 +56,33 @@ interface TabDefinition {
   badge?: number
 }
 
-interface PlaceholderPanelProps {
-  title: string
-  description: string
-  icon: ReactNode
+const VALID_TABS: RecordTab[] = [
+  'daily-agenda',
+  'summary',
+  'medications',
+  'schedule',
+  'appointments',
+  'vital-signs',
+  'care-logs',
+  'alerts',
+  'documents',
+  'timeline',
+  'reports',
+]
+
+function isValidTab(value: string | null): value is RecordTab {
+  return (
+    value !== null &&
+    VALID_TABS.includes(value as RecordTab)
+  )
 }
 
 function formatDate(date?: string | null) {
-  if (!date) return 'Não informado'
+  if (!date) {
+    return 'Não informado'
+  }
 
   return new Date(date).toLocaleString('pt-BR')
-}
-
-function PlaceholderPanel({
-  title,
-  description,
-  icon,
-}: PlaceholderPanelProps) {
-  return (
-    <Card className="p-8">
-      <div className="flex flex-col items-center justify-center py-10 text-center">
-        <div className="rounded-3xl bg-emerald-50 p-5 text-emerald-700">
-          {icon}
-        </div>
-
-        <h2 className="mt-5 text-2xl font-bold text-slate-900">
-          {title}
-        </h2>
-
-        <p className="mt-2 max-w-xl text-slate-500">
-          {description}
-        </p>
-
-        <p className="mt-5 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600">
-          Módulo em desenvolvimento
-        </p>
-      </div>
-    </Card>
-  )
 }
 
 function SummaryTab({
@@ -210,6 +207,7 @@ function SummaryTab({
             <div className="mt-5 grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-slate-500">Pressão</p>
+
                 <strong>
                   {dashboard.latestVitalSign.bloodPressure || '-'}
                 </strong>
@@ -217,6 +215,7 @@ function SummaryTab({
 
               <div>
                 <p className="text-slate-500">Glicemia</p>
+
                 <strong>
                   {dashboard.latestVitalSign.bloodGlucose ?? '-'}
                 </strong>
@@ -224,6 +223,7 @@ function SummaryTab({
 
               <div>
                 <p className="text-slate-500">Temperatura</p>
+
                 <strong>
                   {dashboard.latestVitalSign.temperature !== null &&
                   dashboard.latestVitalSign.temperature !== undefined
@@ -234,6 +234,7 @@ function SummaryTab({
 
               <div>
                 <p className="text-slate-500">Saturação</p>
+
                 <strong>
                   {dashboard.latestVitalSign.oxygenSaturation !== null &&
                   dashboard.latestVitalSign.oxygenSaturation !== undefined
@@ -243,7 +244,10 @@ function SummaryTab({
               </div>
 
               <div>
-                <p className="text-slate-500">Frequência cardíaca</p>
+                <p className="text-slate-500">
+                  Frequência cardíaca
+                </p>
+
                 <strong>
                   {dashboard.latestVitalSign.heartRate !== null &&
                   dashboard.latestVitalSign.heartRate !== undefined
@@ -450,11 +454,20 @@ function TimelineTab({
 export function ElderlyRecordPage() {
   const { id } = useParams()
 
+  const [searchParams, setSearchParams] =
+    useSearchParams()
+
+  const requestedTab = searchParams.get('tab')
+
   const [dashboard, setDashboard] =
     useState<ElderlyDashboard | null>(null)
 
   const [activeTab, setActiveTab] =
-    useState<RecordTab>('daily-agenda')
+    useState<RecordTab>(
+      isValidTab(requestedTab)
+        ? requestedTab
+        : 'daily-agenda',
+    )
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -462,7 +475,9 @@ export function ElderlyRecordPage() {
   useEffect(() => {
     async function loadDashboard() {
       if (!id) {
-        setError('Identificador do idoso não informado.')
+        setError(
+          'Identificador do idoso não informado.',
+        )
         setLoading(false)
         return
       }
@@ -484,8 +499,29 @@ export function ElderlyRecordPage() {
       }
     }
 
-    loadDashboard()
+    void loadDashboard()
   }, [id])
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+
+    if (isValidTab(tab)) {
+      setActiveTab(tab)
+      return
+    }
+
+    if (!tab) {
+      setActiveTab('daily-agenda')
+    }
+  }, [searchParams])
+
+  function handleTabChange(tab: RecordTab) {
+    setActiveTab(tab)
+
+    setSearchParams({
+      tab,
+    })
+  }
 
   if (loading) {
     return <LoadingList rows={8} />
@@ -609,7 +645,9 @@ export function ElderlyRecordPage() {
                       : 'bg-slate-200 text-slate-600',
                   ].join(' ')}
                 >
-                  {dashboard.isActive ? 'Ativo' : 'Inativo'}
+                  {dashboard.isActive
+                    ? 'Ativo'
+                    : 'Inativo'}
                 </span>
               </div>
             </div>
@@ -635,13 +673,16 @@ export function ElderlyRecordPage() {
       <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white p-2 shadow-sm">
         <nav className="flex min-w-max gap-1">
           {tabs.map((tab) => {
-            const isActive = activeTab === tab.id
+            const isActive =
+              activeTab === tab.id
 
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() =>
+                  handleTabChange(tab.id)
+                }
                 className={[
                   'inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition',
                   isActive
@@ -672,7 +713,9 @@ export function ElderlyRecordPage() {
 
       {activeTab === 'daily-agenda' && (
         <DailyAgendaPanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
 
@@ -682,42 +725,57 @@ export function ElderlyRecordPage() {
 
       {activeTab === 'medications' && (
         <MedicationPanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
 
       {activeTab === 'schedule' && (
         <MedicationSchedulePanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
 
       {activeTab === 'appointments' && (
         <MedicalAppointmentPanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
 
       {activeTab === 'vital-signs' && (
         <VitalSignPanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
 
       {activeTab === 'care-logs' && (
         <CareLogPanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
+
       {activeTab === 'alerts' && (
         <AlertPanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
 
       {activeTab === 'documents' && (
         <DocumentPanel
-          elderlyPersonId={dashboard.elderlyPersonId}
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
 
@@ -726,10 +784,10 @@ export function ElderlyRecordPage() {
       )}
 
       {activeTab === 'reports' && (
-        <PlaceholderPanel
-          title="Relatórios"
-          description="Aqui serão gerados resumos clínicos, relatórios detalhados, arquivos PDF e impressões."
-          icon={<FileText size={32} />}
+        <ReportPanel
+          elderlyPersonId={
+            dashboard.elderlyPersonId
+          }
         />
       )}
     </div>
