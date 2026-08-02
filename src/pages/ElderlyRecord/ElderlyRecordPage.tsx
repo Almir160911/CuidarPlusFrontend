@@ -15,8 +15,7 @@ import {
   HeartPulse,
   LayoutDashboard,
   Pill,
-  Stethoscope,
-  UserRound,
+  Stethoscope,  
 } from 'lucide-react'
 
 import { AlertPanel } from '../../components/elderly-record/AlertPanel'
@@ -35,6 +34,7 @@ import { StatsCard } from '../../components/ui/StatsCard'
 import { dashboardService } from '../../services/dashboard.service'
 import type { ElderlyDashboard } from '../../types/elderly-dashboard'
 import { ReportPanel } from '../../components/elderly-record/ReportPanel'
+import { ElderlyPhotoAvatar } from '../../components/elderly-record/ElderlyPhotoAvatar'
 
 type RecordTab =
   | 'daily-agenda'
@@ -611,54 +611,53 @@ export function ElderlyRecordPage() {
       </Link>
 
       <Card className="p-6">
-        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-start">
-          <div className="flex gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl bg-emerald-100 text-emerald-700">
-              <UserRound size={30} />
-            </div>
+        <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-start">
+          <div className="shrink-0">
+            <ElderlyPhotoAvatar
+              elderlyPersonId={dashboard.elderlyPersonId}
+              elderlyPersonName={dashboard.elderlyPersonName}
+            />
+          </div>
 
-            <div>
-              <p className="text-sm font-medium text-emerald-700">
-                Prontuário do Idoso
-              </p>
+          <div className="min-w-0 pt-1">
+            <p className="text-sm font-medium text-emerald-700">
+              Prontuário do Idoso
+            </p>
 
-              <h1 className="mt-1 text-3xl font-bold text-slate-900">
-                {dashboard.elderlyPersonName}
-              </h1>
+            <h1 className="mt-1 break-words text-3xl font-bold text-slate-900">
+              {dashboard.elderlyPersonName}
+            </h1>
 
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
-                <span>{dashboard.age} anos</span>
-                <span>•</span>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+              <span>{dashboard.age} anos</span>
+              <span>•</span>
 
-                <span>
-                  Nascimento:{' '}
-                  {new Date(
-                    dashboard.birthDate,
-                  ).toLocaleDateString('pt-BR')}
-                </span>
+              <span>
+                Nascimento:{' '}
+                {new Date(
+                  dashboard.birthDate,
+                ).toLocaleDateString('pt-BR')}
+              </span>
 
-                <span
-                  className={[
-                    'rounded-full px-3 py-1 text-xs font-semibold',
-                    dashboard.isActive
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-slate-200 text-slate-600',
-                  ].join(' ')}
-                >
-                  {dashboard.isActive
-                    ? 'Ativo'
-                    : 'Inativo'}
-                </span>
-              </div>
+              <span
+                className={[
+                  'rounded-full px-3 py-1 text-xs font-semibold',
+                  dashboard.isActive
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-slate-200 text-slate-600',
+                ].join(' ')}
+              >
+                {dashboard.isActive ? 'Ativo' : 'Inativo'}
+              </span>
             </div>
           </div>
 
-          <div className="rounded-2xl bg-emerald-50 px-5 py-4 text-emerald-800">
+          <div className="w-full rounded-2xl bg-emerald-50 px-5 py-4 text-emerald-800 lg:w-64">
             <p className="text-xs font-semibold uppercase tracking-wide">
               Contato de emergência
             </p>
 
-            <p className="mt-1 font-bold">
+            <p className="mt-1 break-words font-bold">
               {dashboard.emergencyContactName ||
                 'Não informado'}
             </p>

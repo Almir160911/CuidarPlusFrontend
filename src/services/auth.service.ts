@@ -6,16 +6,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface ResetPasswordRequest {
-  email: string;
-  token: string;
-  newPassword: string;
-}
-
 export interface AuthenticatedUser {
   id?: string;
   userId?: string;
@@ -203,7 +193,8 @@ export const authService = {
        * Deixe este console.log apenas durante o diagnóstico.
        * Depois que o login funcionar, poderá removê-lo.
        */
-      console.log('Resposta do login:', response.data);
+      
+      /*console.log('Resposta do login:', response.data);*/
 
       const responseData = extractResponseData(response.data);
       const token = extractToken(responseData);
