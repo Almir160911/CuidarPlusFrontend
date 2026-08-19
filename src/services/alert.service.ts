@@ -1,6 +1,7 @@
 import { api } from './api'
 import type {
   Alert,
+  AlertFilterParams,
   AlertListParams,
   AlertListResult,
 } from '../types/alert'
@@ -10,7 +11,6 @@ interface ApiEnvelope<T> {
   message?: string
   data?: T
 }
-
 
 interface ApiPagedResponse<T> {
   items?: T[]
@@ -25,7 +25,8 @@ function unwrapData(value: unknown): unknown {
     return value
   }
 
-  const envelope = value as ApiEnvelope<unknown>
+  const envelope =
+    value as ApiEnvelope<unknown>
 
   return envelope.data ?? value
 }
@@ -55,36 +56,58 @@ function normalizeList(
     }
   }
 
-  const response = data as ApiPagedResponse<Alert>
-  const items = Array.isArray(response.items)
-    ? response.items
-    : []
+  const response =
+    data as ApiPagedResponse<Alert>
+
+  const items =
+    Array.isArray(response.items)
+      ? response.items
+      : []
 
   return {
     items,
-    totalItems: response.totalItems ?? items.length,
-    page: response.page ?? response.pageNumber ?? requestedPage,
-    pageSize: response.pageSize ?? requestedPageSize,
+    totalItems:
+      response.totalItems ?? items.length,
+    page:
+      response.page ??
+      response.pageNumber ??
+      requestedPage,
+    pageSize:
+      response.pageSize ??
+      requestedPageSize,
+  }
+}
+
+function createQueryParams(
+  params: AlertFilterParams,
+) {
+  return {
+    Page: params.page ?? 1,
+    PageSize: params.pageSize ?? 20,
+    Search:
+      params.search?.trim() || undefined,
+    Severity:
+      params.severity || undefined,
+    IsRead: params.isRead,
+    FromDate:
+      params.fromDate || undefined,
+    ToDate:
+      params.toDate || undefined,
   }
 }
 
 export const alertService = {
-  async listByElderly(
-    params: AlertListParams,
+  async list(
+    params: AlertFilterParams,
   ): Promise<AlertListResult> {
     const page = params.page ?? 1
-    const pageSize = params.pageSize ?? 20
+    const pageSize =
+      params.pageSize ?? 20
 
     const response = await api.get(
-      `/api/alerts/elderly/${params.elderlyPersonId}`,
+      '/api/alerts',
       {
-        params: {
-          Page: page,
-          PageSize: pageSize,
-          Search: params.search?.trim() || undefined,
-          Severity: params.severity || undefined,
-          IsRead: params.isRead,
-        },
+        params: createQueryParams(params),
       },
     )
 
@@ -95,8 +118,32 @@ export const alertService = {
     )
   },
 
-    async markAsRead(id: string): Promise<void> {
-    await api.patch(`/api/alerts/${id}/read`)
-    },
+  async listByElderly(
+    params: AlertListParams,
+  ): Promise<AlertListResult> {
+    const page = params.page ?? 1
+    const pageSize =
+      params.pageSize ?? 20
 
+    const response = await api.get(
+      `/api/alerts/elderly/${params.elderlyPersonId}`,
+      {
+        params: createQueryParams(params),
+      },
+    )
+
+    return normalizeList(
+      response.data,
+      page,
+      pageSize,
+    )
+  },
+
+  async markAsRead(
+    id: string,
+  ): Promise<void> {
+    await api.patch(
+      `/api/alerts/${id}/read`,
+    )
+  },
 }

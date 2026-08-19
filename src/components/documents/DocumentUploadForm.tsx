@@ -9,6 +9,7 @@ import { Button } from '../ui/Button'
 
 interface DocumentUploadFormProps {
   elderlyPersonId: string
+  medicalAppointmentId?: string
   uploading?: boolean
   onSubmit: (
     payload: UploadElderlyDocumentRequest,
@@ -20,6 +21,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024
 
 export function DocumentUploadForm({
   elderlyPersonId,
+  medicalAppointmentId,
   uploading = false,
   onSubmit,
   onCancel,
@@ -79,6 +81,7 @@ export function DocumentUploadForm({
 
     await onSubmit({
       elderlyPersonId,
+      medicalAppointmentId,
       type: type as UploadElderlyDocumentRequest['type'],
       description: description.trim() || undefined,
       file,

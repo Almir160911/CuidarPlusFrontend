@@ -145,4 +145,40 @@ export const medicalAppointmentService = {
       response.data,
     )
   },
-}
+
+async list(
+  filters: MedicalAppointmentFilters = {},
+): Promise<MedicalAppointmentListResult> {
+  const page = filters.page ?? 1
+  const pageSize = filters.pageSize ?? 20
+
+  const response = await api.get(
+    '/api/medical-appointments',
+    {
+      params: {
+        Page: page,
+        PageSize: pageSize,
+        Search:
+          filters.search?.trim() || undefined,
+        FromDate:
+          filters.fromDate || undefined,
+        ToDate:
+          filters.toDate || undefined,
+        DoctorName:
+          filters.doctorName?.trim() || undefined,
+        Specialty:
+          filters.specialty?.trim() || undefined,
+        Location:
+          filters.location?.trim() || undefined,
+      },
+    },
+  )
+
+  return normalizeListResponse(
+    response.data,
+    page,
+    pageSize,
+  )
+},
+
+ }

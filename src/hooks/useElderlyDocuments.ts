@@ -76,15 +76,20 @@ export function useElderlyDocuments(
     }
   }
 
-  function openDocument(document: ElderlyDocument) {
-    const url =
-      elderlyDocumentService.buildFileUrl(document)
+  async function openDocument(
+    document: ElderlyDocument,
+  ) {
+    setError('')
 
-    window.open(
-      url,
-      '_blank',
-      'noopener,noreferrer',
-    )
+    try {
+      await elderlyDocumentService.openDocument(
+        document,
+      )
+    } catch {
+      setError(
+        'Não foi possível abrir o documento.',
+      )
+    }
   }
 
   const filteredItems = useMemo(() => {

@@ -22,6 +22,12 @@ export interface ElderlyDocument {
   description?: string | null
   uploadedAt: string
   uploadedByUserId: string
+  medicalAppointmentId?: string | null
+}
+
+export interface ElderlyDocumentListResult {
+  items: ElderlyDocument[]
+  totalItems: number
 }
 
 export interface UploadElderlyDocumentRequest {
@@ -29,9 +35,5 @@ export interface UploadElderlyDocumentRequest {
   type: DocumentType
   description?: string
   file: File
-}
-
-export interface ElderlyDocumentListResult {
-  items: ElderlyDocument[]
-  totalItems: number
+  medicalAppointmentId?: string
 }

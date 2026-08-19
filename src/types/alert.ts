@@ -25,11 +25,17 @@ export interface AlertListResult {
   pageSize: number
 }
 
-export interface AlertListParams {
-  elderlyPersonId: string
+export interface AlertFilterParams {
   page?: number
   pageSize?: number
   search?: string
   severity?: string
   isRead?: boolean
+  fromDate?: string
+  toDate?: string
+}
+
+export interface AlertListParams
+  extends AlertFilterParams {
+  elderlyPersonId: string
 }

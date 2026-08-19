@@ -3,19 +3,28 @@ import {
   Route,
   Routes,
 } from 'react-router-dom'
+import type { ReactNode } from 'react'
+
 import { AppLayout } from '../../layouts/AppLayout/AppLayout'
-import LoginPage from '../../pages/Login/LoginPage/LoginPage';
+
+import LoginPage from '../../pages/Login/LoginPage/LoginPage'
 import { DashboardPage } from '../../pages/Dashboard/DashboardPage/DashboardPage'
-import { ElderlyPage } from '../../pages/Elderly/ElderlyPage'
 import { PlaceholderPage } from '../../pages/Dashboard/PlaceholderPage/PlaceholderPage'
+import { ElderlyPage } from '../../pages/Elderly/ElderlyPage'
 import { ElderlyRecordPage } from '../../pages/ElderlyRecord/ElderlyRecordPage'
+import { UnifiedCalendarPage } from '../../pages/UnifiedCalendar/UnifiedCalendarPage'
+import { MedicalAppointmentsPage } from '../../pages/MedicalAppointments/MedicalAppointmentsPage'
+import { AlertsPage } from '../../pages/Alerts/AlertsPage'
+
 import { authService } from '../../services/auth.service'
+
+interface PrivateRouteProps {
+  children: ReactNode
+}
 
 function PrivateRoute({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: PrivateRouteProps) {
   if (!authService.isAuthenticated()) {
     return (
       <Navigate
@@ -36,7 +45,7 @@ export function AppRoutes() {
         element={<LoginPage />}
       />
 
-<Route
+      <Route
         path="/"
         element={
           <PrivateRoute>
@@ -55,6 +64,11 @@ export function AppRoutes() {
         />
 
         <Route
+          path="idosos/:id"
+          element={<ElderlyRecordPage />}
+        />
+
+        <Route
           path="medicamentos"
           element={
             <PlaceholderPage title="Medicamentos" />
@@ -64,7 +78,7 @@ export function AppRoutes() {
         <Route
           path="agendamentos"
           element={
-            <PlaceholderPage title="Agendamentos de Medicamentos" />
+            <UnifiedCalendarPage />
           }
         />
 
@@ -84,16 +98,12 @@ export function AppRoutes() {
 
         <Route
           path="consultas"
-          element={
-            <PlaceholderPage title="Consultas Médicas" />
-          }
+          element={<MedicalAppointmentsPage />}
         />
 
         <Route
           path="alertas"
-          element={
-            <PlaceholderPage title="Alertas" />
-          }
+          element={<AlertsPage />}
         />
 
         <Route
@@ -101,11 +111,6 @@ export function AppRoutes() {
           element={
             <PlaceholderPage title="Relatórios" />
           }
-        />
-
-        <Route
-          path="idosos/:id"
-          element={<ElderlyRecordPage />}
         />
       </Route>
 
