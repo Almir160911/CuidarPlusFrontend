@@ -4,6 +4,8 @@ import type {
   Medication,
   MedicationListParams,
   MedicationListResult,
+  OrganizationMedicationListParams,
+  
 } from '../types/medication'
 
 interface ApiEnvelope<T> {
@@ -101,6 +103,30 @@ export const medicationService = {
       pageSize,
     )
   },
+
+  async listByOrganization(
+    params: OrganizationMedicationListParams,
+  ): Promise<MedicationListResult> {
+    const page = params.page ?? 1
+    const pageSize = params.pageSize ?? 20
+
+    const response = await api.get(
+      '/api/medications',
+      {
+        params: {
+          Page: page,
+          PageSize: pageSize,
+          Search: params.search?.trim() || undefined,
+        },
+      },
+    )
+
+    return normalizeMedicationListResponse(
+      response.data,
+      page,
+      pageSize,
+    )
+  }, 
 
   async getById(id: string): Promise<Medication> {
     const response = await api.get(

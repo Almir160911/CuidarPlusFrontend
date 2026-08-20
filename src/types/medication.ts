@@ -1,12 +1,15 @@
 export interface Medication {
-  id?: string
-  elderlyPersonId?: string
-  name?: string
-  dosage?: string
-  frequency?: string
-  notes?: string
+  id: string
+  organizationId: string
+  elderlyPersonId: string
+  name: string
+  dosage: string
+  frequency: string
+  notes?: string | null
   startDate?: string | null
   endDate?: string | null
+  isActive: boolean
+  createdAt: string
 }
 
 export interface CreateMedicationRequest {
@@ -21,6 +24,12 @@ export interface CreateMedicationRequest {
 
 export interface MedicationListParams {
   elderlyPersonId: string
+  page?: number
+  pageSize?: number
+  search?: string
+}
+
+export interface OrganizationMedicationListParams {
   page?: number
   pageSize?: number
   search?: string

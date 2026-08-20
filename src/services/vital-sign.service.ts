@@ -1,4 +1,6 @@
+
 import { api } from './api'
+
 import type {
   CreateVitalSignRequest,
   VitalSign,
@@ -6,7 +8,36 @@ import type {
   VitalSignListResult,
 } from '../types/vital-sign'
 
-function normalizeList(data: unknown): VitalSignListResult {
+interface ApiEnvelope<T> {
+  success?: boolean
+  message?: string
+  data?: T
+}
+
+interface ApiPagedResponse<T> {
+  items?: T[]
+  totalItems?: number
+  total?: number
+  page?: number
+  pageNumber?: number
+  pageSize?: number
+}
+
+function unwrapData(data: unknown): unknown {
+  if (!data || typeof data !== 'object') {
+    return data
+  }
+
+  const envelope = data as ApiEnvelope<unknown>
+
+  return envelope.data ?? data
+}
+
+function normalizeList(
+  responseData: unknown,
+): VitalSignListResult {
+  const data = unwrapData(responseData)
+
   if (Array.isArray(data)) {
     return {
       items: data as VitalSign[],
@@ -14,35 +45,34 @@ function normalizeList(data: unknown): VitalSignListResult {
     }
   }
 
-  if (data && typeof data === 'object') {
-    const obj = data as Record<string, unknown>
-
-    const items =
-      Array.isArray(obj.items)
-        ? obj.items
-        : Array.isArray(obj.data)
-          ? obj.data
-          : Array.isArray(obj.results)
-            ? obj.results
-            : []
-
-    const totalItems =
-      typeof obj.totalItems === 'number'
-        ? obj.totalItems
-        : typeof obj.total === 'number'
-          ? obj.total
-          : items.length
-
+  if (!data || typeof data !== 'object') {
     return {
-      items: items as VitalSign[],
-      totalItems,
+      items: [],
+      totalItems: 0,
     }
   }
 
+  const response =
+    data as ApiPagedResponse<VitalSign>
+
+  const items =
+    Array.isArray(response.items)
+      ? response.items
+      : []
+
   return {
-    items: [],
-    totalItems: 0,
+    items,
+    totalItems:
+      response.totalItems ??
+      response.total ??
+      items.length,
   }
+}
+
+function normalizeItem(
+  responseData: unknown,
+): VitalSign {
+  return unwrapData(responseData) as VitalSign
 }
 
 export const vitalSignService = {
@@ -55,9 +85,37 @@ export const vitalSignService = {
         params: {
           Page: params.page ?? 1,
           PageSize: params.pageSize ?? 100,
-          Search: params.search || undefined,
-          FromDate: params.fromDate || undefined,
-          ToDate: params.toDate || undefined,
+          Search:
+            params.search?.trim() || undefined,
+          FromDate:
+            params.fromDate || undefined,
+          ToDate:
+            params.toDate || undefined,
+        },
+      },
+    )
+
+    return normalizeList(response.data)
+  },
+
+  async listByOrganization(
+    params: Omit<
+      VitalSignListParams,
+      'elderlyPersonId'
+    > = {},
+  ): Promise<VitalSignListResult> {
+    const response = await api.get(
+      '/api/vital-signs',
+      {
+        params: {
+          Page: params.page ?? 1,
+          PageSize: params.pageSize ?? 20,
+          Search:
+            params.search?.trim() || undefined,
+          FromDate:
+            params.fromDate || undefined,
+          ToDate:
+            params.toDate || undefined,
         },
       },
     )
@@ -68,11 +126,11 @@ export const vitalSignService = {
   async create(
     payload: CreateVitalSignRequest,
   ): Promise<VitalSign> {
-    const response = await api.post<VitalSign>(
+    const response = await api.post(
       '/api/vital-signs',
       payload,
     )
 
-    return response.data
+    return normalizeItem(response.data)
   },
 }

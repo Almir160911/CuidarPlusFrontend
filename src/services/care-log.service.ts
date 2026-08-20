@@ -118,6 +118,35 @@ export const careLogService = {
     )
   },
 
+  async listByOrganization(
+    filters: CareLogFilters = {},
+  ): Promise<CareLogListResult> {
+    const page = filters.page ?? 1
+    const pageSize = filters.pageSize ?? 20
+
+    const response = await api.get(
+      '/api/care-logs',
+      {
+        params: {
+          Page: page,
+          PageSize: pageSize,
+          Search: filters.search?.trim() || undefined,
+          FromDate: filters.fromDate || undefined,
+          ToDate: filters.toDate || undefined,
+          Mood: filters.mood?.trim() || undefined,
+          HadPain: filters.hadPain,
+          HadFall: filters.hadFall,
+        },
+      },
+    )
+
+    return normalizeListResponse(
+      response.data,
+      page,
+      pageSize,
+    )
+  },
+
   async create(
     payload: CreateCareLogRequest,
   ): Promise<CareLog> {
