@@ -5,29 +5,45 @@ import type {
   ElderlySummaryReport,
 } from '../types/report'
 
+function unwrapApiResponse<T>(
+  value: T | ApiResponse<T>,
+): T {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'data' in value
+  ) {
+    return (value as ApiResponse<T>).data
+  }
+
+  return value as T
+}
+
 export const reportService = {
   async getSummary(
     elderlyPersonId: string,
   ): Promise<ElderlySummaryReport> {
     const response = await api.get<
+      ElderlySummaryReport |
       ApiResponse<ElderlySummaryReport>
     >(
       `/api/reports/elderly/${elderlyPersonId}/summary`,
     )
 
-    return response.data.data
+    return unwrapApiResponse(response.data)
   },
 
   async getDetailed(
     elderlyPersonId: string,
   ): Promise<ElderlyDetailedReport> {
     const response = await api.get<
+      ElderlyDetailedReport |
       ApiResponse<ElderlyDetailedReport>
     >(
       `/api/reports/elderly/${elderlyPersonId}/detailed`,
     )
 
-    return response.data.data
+    return unwrapApiResponse(response.data)
   },
 
   async downloadPdf(

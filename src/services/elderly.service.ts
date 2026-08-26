@@ -1,4 +1,5 @@
 import { api } from './api'
+import { unwrapApiResponse } from '../types/api-response'
 import type {
   CreateElderlyPersonRequest,
   ElderlyListParams,
@@ -102,23 +103,25 @@ export const elderlyService = {
   async getById(
     id: string,
   ): Promise<ElderlyPerson> {
-    const response = await api.get<
-      ElderlyPerson
-    >(`/api/elderly-people/${id}`)
+    const response = await api.get(
+      `/api/elderly-people/${id}`,
+    )
 
-    return response.data
+    return unwrapApiResponse<ElderlyPerson>(
+      response.data,
+    )
   },
 
   async create(
     payload: CreateElderlyPersonRequest,
   ): Promise<ElderlyPerson> {
-    const response = await api.post<
-      ElderlyPerson
-    >(
+    const response = await api.post(
       '/api/elderly-people',
       payload,
     )
 
-    return response.data
+    return unwrapApiResponse<ElderlyPerson>(
+      response.data,
+    )
   },
 }
