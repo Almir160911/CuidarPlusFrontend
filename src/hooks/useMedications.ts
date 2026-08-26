@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { medicationService } from '../services/medication.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   CreateMedicationRequest,
   Medication,
@@ -37,8 +38,13 @@ export function useMedications(elderlyPersonId?: string) {
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
-      setError('Não foi possível carregar os medicamentos.')
+    } catch (error) {
+      setError(
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os medicamentos.',
+        ),
+      )
       setItems([])
       setTotalItems(0)
     } finally {
@@ -53,9 +59,14 @@ export function useMedications(elderlyPersonId?: string) {
     try {
       await medicationService.create(payload)
       await load()
-    } catch {
-      setError('Não foi possível cadastrar o medicamento.')
-      throw new Error('Erro ao cadastrar medicamento.')
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
+        'Não foi possível cadastrar o medicamento.',
+      )
+
+      setError(message)
+      throw new Error(message)
     } finally {
       setSaving(false)
     }

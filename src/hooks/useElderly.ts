@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { elderlyService } from '../services/elderly.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   CreateElderlyPersonRequest,
   ElderlyListResult,
@@ -30,8 +31,13 @@ export function useElderly() {
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
-      setError('Não foi possível carregar os idosos.')
+    } catch (error) {
+      setError(
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os idosos.',
+        ),
+      )
       setItems([])
       setTotalItems(0)
     } finally {
@@ -46,9 +52,19 @@ export function useElderly() {
     try {
       await elderlyService.create(payload)
       await load()
-    } catch {
-      setError('Não foi possível cadastrar o idoso.')
-      throw new Error('Erro ao cadastrar idoso.')
+    } catch (error) {
+      setError(
+        getApiErrorMessage(
+          error,
+          'Não foi possível cadastrar o idoso.',
+        ),
+      )
+      throw new Error(
+        getApiErrorMessage(
+          error,
+          'Não foi possível cadastrar o idoso.',
+        ),
+      )
     } finally {
       setSaving(false)
     }

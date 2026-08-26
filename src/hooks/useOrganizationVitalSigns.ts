@@ -6,6 +6,7 @@ import {
 } from 'react'
 
 import { vitalSignService } from '../services/vital-sign.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type { VitalSign } from '../types/vital-sign'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -36,12 +37,15 @@ export function useOrganizationVitalSigns() {
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
+    } catch (error) {
       setItems([])
       setTotalItems(0)
 
       setError(
-        'Não foi possível carregar os sinais vitais.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os sinais vitais.',
+        ),
       )
     } finally {
       setLoading(false)

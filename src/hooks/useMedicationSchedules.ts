@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { medicationScheduleService } from '../services/medication-schedule.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   CreateMedicationScheduleRequest,
   MedicationSchedule,
@@ -29,10 +30,13 @@ export function useMedicationSchedules(
         )
 
       setItems(result.items)
-    } catch {
+    } catch (error) {
       setItems([])
       setError(
-        'Não foi possível carregar a agenda do medicamento.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar a agenda do medicamento.',
+        ),
       )
     } finally {
       setLoading(false)
@@ -48,9 +52,14 @@ export function useMedicationSchedules(
     try {
       await medicationScheduleService.create(payload)
       await load()
-    } catch {
-      setError('Não foi possível cadastrar o horário.')
-      throw new Error('Erro ao cadastrar horário.')
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
+        'Não foi possível cadastrar o horário.',
+      )
+
+      setError(message)
+      throw new Error(message)
     } finally {
       setSaving(false)
     }
@@ -70,9 +79,12 @@ export function useMedicationSchedules(
       )
 
       await load()
-    } catch {
+    } catch (error) {
       setError(
-        'Não foi possível confirmar o medicamento como tomado.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível confirmar o medicamento como tomado.',
+        ),
       )
     } finally {
       setSaving(false)
@@ -93,9 +105,12 @@ export function useMedicationSchedules(
       )
 
       await load()
-    } catch {
+    } catch (error) {
       setError(
-        'Não foi possível registrar o medicamento como não tomado.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível registrar o medicamento como não tomado.',
+        ),
       )
     } finally {
       setSaving(false)

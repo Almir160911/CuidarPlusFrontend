@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react'
 import { elderlyDocumentService } from '../services/elderly-document.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   ElderlyDocument,
   UploadElderlyDocumentRequest,
@@ -40,10 +41,13 @@ export function useElderlyDocuments(
         )
 
       setItems(result.items)
-    } catch {
+    } catch (error) {
       setItems([])
       setError(
-        'Não foi possível carregar os documentos.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os documentos.',
+        ),
       )
     } finally {
       setLoading(false)
@@ -63,14 +67,14 @@ export function useElderlyDocuments(
       await load()
 
       return document
-    } catch {
-      setError(
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
         'Não foi possível enviar o documento.',
       )
 
-      throw new Error(
-        'Erro ao enviar documento.',
-      )
+      setError(message)
+      throw new Error(message)
     } finally {
       setUploading(false)
     }
@@ -85,9 +89,12 @@ export function useElderlyDocuments(
       await elderlyDocumentService.openDocument(
         document,
       )
-    } catch {
+    } catch (error) {
       setError(
-        'Não foi possível abrir o documento.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível abrir o documento.',
+        ),
       )
     }
   }

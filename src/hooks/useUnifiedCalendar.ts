@@ -6,6 +6,7 @@ import {
 } from 'react'
 
 import { calendarService } from '../services/calendar.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   CalendarEvent,
   CalendarEventType,
@@ -86,10 +87,13 @@ export function useUnifiedCalendar() {
         )
 
       setItems(result.events)
-    } catch {
+    } catch (error) {
       setItems([])
       setError(
-        'Não foi possível carregar o calendário.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar o calendário.',
+        ),
       )
     } finally {
       setLoading(false)

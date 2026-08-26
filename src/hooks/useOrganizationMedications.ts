@@ -6,6 +6,7 @@ import {
 } from 'react'
 
 import { medicationService } from '../services/medication.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type { Medication } from '../types/medication'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -38,11 +39,14 @@ export function useOrganizationMedications() {
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
+    } catch (error) {
       setItems([])
       setTotalItems(0)
       setError(
-        'Não foi possível carregar os medicamentos.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os medicamentos.',
+        ),
       )
     } finally {
       setLoading(false)
