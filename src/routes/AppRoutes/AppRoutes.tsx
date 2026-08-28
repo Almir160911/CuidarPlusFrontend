@@ -8,6 +8,9 @@ import type { ReactNode } from 'react'
 import { AppLayout } from '../../layouts/AppLayout/AppLayout'
 
 import LoginPage from '../../pages/Login/LoginPage/LoginPage'
+import { ForgotPasswordPage } from '../../pages/ForgotPassword/ForgotPasswordPage'
+import { ResetPasswordPage } from '../../pages/ResetPassword/ResetPasswordPage'
+import { RegisterPage } from '../../pages/Register/RegisterPage'
 import { DashboardPage } from '../../pages/Dashboard/DashboardPage/DashboardPage'
 import { ElderlyPage } from '../../pages/Elderly/ElderlyPage'
 import { ElderlyRecordPage } from '../../pages/ElderlyRecord/ElderlyRecordPage'
@@ -85,6 +88,21 @@ export function AppRoutes() {
       <Route
         path="/login"
         element={<LoginPage />}
+      />
+
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage />}
+      />
+
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
+      />
+
+      <Route
+        path="/register"
+        element={<RegisterPage />}
       />
 
       <Route
