@@ -8,6 +8,9 @@ import type { ReactNode } from 'react'
 import { AppLayout } from '../../layouts/AppLayout/AppLayout'
 
 import LoginPage from '../../pages/Login/LoginPage/LoginPage'
+import { ForgotPasswordPage } from '../../pages/ForgotPassword/ForgotPasswordPage'
+import { ResetPasswordPage } from '../../pages/ResetPassword/ResetPasswordPage'
+import { RegisterPage } from '../../pages/Register/RegisterPage'
 import { DashboardPage } from '../../pages/Dashboard/DashboardPage/DashboardPage'
 import { ElderlyPage } from '../../pages/Elderly/ElderlyPage'
 import { ElderlyRecordPage } from '../../pages/ElderlyRecord/ElderlyRecordPage'
@@ -18,16 +21,27 @@ import { ReportsPage } from '../../pages/Reports/ReportsPage'
 import { MedicationsPage } from '../../pages/Medications/MedicationsPage'
 import { CareLogsPage } from '../../pages/CareLogs/CareLogsPage'
 import { VitalSignsPage } from '../../pages/VitalSigns/VitalSignsPage'
+import { MyElderlyPage } from '../../pages/MyElderly/MyElderlyPage'
 
 import { authService } from '../../services/auth.service'
 
-interface PrivateRouteProps {
+interface RouteProps {
   children: ReactNode
+}
+
+function isGlobalAdmin(): boolean {
+  const role =
+    authService.getUser()?.role?.toLowerCase()
+
+  return (
+    role === 'systemadmin' ||
+    role === 'familyadmin'
+  )
 }
 
 function PrivateRoute({
   children,
-}: PrivateRouteProps) {
+}: RouteProps) {
   if (!authService.isAuthenticated()) {
     return (
       <Navigate
@@ -40,12 +54,55 @@ function PrivateRoute({
   return children
 }
 
+function AdminRoute({
+  children,
+}: RouteProps) {
+  if (!isGlobalAdmin()) {
+    return (
+      <Navigate
+        to="/minhas-pessoas"
+        replace
+      />
+    )
+  }
+
+  return children
+}
+
+function HomeRoute() {
+  if (isGlobalAdmin()) {
+    return <DashboardPage />
+  }
+
+  return (
+    <Navigate
+      to="/minhas-pessoas"
+      replace
+    />
+  )
+}
+
 export function AppRoutes() {
   return (
     <Routes>
       <Route
         path="/login"
         element={<LoginPage />}
+      />
+
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage />}
+      />
+
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
+      />
+
+      <Route
+        path="/register"
+        element={<RegisterPage />}
       />
 
       <Route
@@ -58,12 +115,12 @@ export function AppRoutes() {
       >
         <Route
           index
-          element={<DashboardPage />}
+          element={<HomeRoute />}
         />
 
         <Route
-          path="idosos"
-          element={<ElderlyPage />}
+          path="minhas-pessoas"
+          element={<MyElderlyPage />}
         />
 
         <Route
@@ -72,40 +129,71 @@ export function AppRoutes() {
         />
 
         <Route
-          path="medicamentos"
-          element={<MedicationsPage />}
+          path="agendamentos"
+          element={<UnifiedCalendarPage />}
         />
 
         <Route
-          path="agendamentos"
+          path="idosos"
           element={
-            <UnifiedCalendarPage />
+            <AdminRoute>
+              <ElderlyPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="medicamentos"
+          element={
+            <AdminRoute>
+              <MedicationsPage />
+            </AdminRoute>
           }
         />
 
         <Route
           path="cuidados"
-          element={<CareLogsPage />}
+          element={
+            <AdminRoute>
+              <CareLogsPage />
+            </AdminRoute>
+          }
         />
 
         <Route
           path="sinais-vitais"
-          element={<VitalSignsPage />}
+          element={
+            <AdminRoute>
+              <VitalSignsPage />
+            </AdminRoute>
+          }
         />
 
         <Route
           path="consultas"
-          element={<MedicalAppointmentsPage />}
+          element={
+            <AdminRoute>
+              <MedicalAppointmentsPage />
+            </AdminRoute>
+          }
         />
 
         <Route
           path="alertas"
-          element={<AlertsPage />}
+          element={
+            <AdminRoute>
+              <AlertsPage />
+            </AdminRoute>
+          }
         />
 
         <Route
           path="relatorios"
-          element={<ReportsPage />}
+          element={
+            <AdminRoute>
+              <ReportsPage />
+            </AdminRoute>
+          }
         />
       </Route>
 

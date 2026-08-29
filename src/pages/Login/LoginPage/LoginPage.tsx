@@ -2,7 +2,7 @@ import {
   type FormEvent,
   useState,
 } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Eye,
   EyeOff,
@@ -16,6 +16,14 @@ import authService from '../../../services/auth.service';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const successMessage =
+    (
+      location.state as
+        | { message?: string }
+        | null
+    )?.message ?? null;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -193,6 +201,24 @@ export default function LoginPage() {
             </div>
           )}
 
+          <div className="flex justify-end">
+            <Link
+              className="text-sm font-medium text-emerald-700 transition hover:text-emerald-800"
+              to="/forgot-password"
+            >
+              Esqueci minha senha
+            </Link>
+          </div>
+
+          {successMessage && (
+            <div
+              className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+              role="status"
+            >
+              {successMessage}
+            </div>
+          )}
+
           <button
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={loading}
@@ -209,6 +235,19 @@ export default function LoginPage() {
               ? 'Entrando...'
               : 'Entrar'}
           </button>
+
+          <div className="border-t border-slate-200 pt-5 text-center">
+            <p className="text-sm text-slate-500">
+              Ainda não possui uma conta?
+            </p>
+
+            <Link
+              className="mt-2 inline-block font-semibold text-emerald-700 transition hover:text-emerald-800"
+              to="/register"
+            >
+              Criar conta
+            </Link>
+          </div>
         </form>
       </section>
     </main>

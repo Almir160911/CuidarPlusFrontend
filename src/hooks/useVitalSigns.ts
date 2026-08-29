@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { vitalSignService } from '../services/vital-sign.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   CreateVitalSignRequest,
   VitalSign,
@@ -26,9 +27,14 @@ export function useVitalSigns(elderlyPersonId?: string) {
       })
 
       setItems(result.items)
-    } catch {
+    } catch (error) {
       setItems([])
-      setError('Não foi possível carregar os sinais vitais.')
+      setError(
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os sinais vitais.',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -41,9 +47,14 @@ export function useVitalSigns(elderlyPersonId?: string) {
     try {
       await vitalSignService.create(payload)
       await load()
-    } catch {
-      setError('Não foi possível registrar os sinais vitais.')
-      throw new Error('Erro ao registrar sinais vitais.')
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
+        'Não foi possível registrar os sinais vitais.',
+      )
+
+      setError(message)
+      throw new Error(message)
     } finally {
       setSaving(false)
     }

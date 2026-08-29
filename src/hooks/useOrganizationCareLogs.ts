@@ -38,7 +38,7 @@ export function useOrganizationCareLogs() {
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
+    } catch (error) {
       setItems([])
       setTotalItems(0)
 

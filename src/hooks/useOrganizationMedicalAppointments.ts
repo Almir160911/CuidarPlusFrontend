@@ -6,6 +6,7 @@ import {
 } from 'react'
 
 import { medicalAppointmentService } from '../services/medical-appointment.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type { MedicalAppointment } from '../types/medical-appointment'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -40,11 +41,14 @@ export function useOrganizationMedicalAppointments() {
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
+    } catch (error) {
       setItems([])
       setTotalItems(0)
       setError(
-        'Não foi possível carregar as consultas médicas.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar as consultas médicas.',
+        ),
       )
     } finally {
       setLoading(false)

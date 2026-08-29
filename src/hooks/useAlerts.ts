@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react'
 import { alertService } from '../services/alert.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type { Alert } from '../types/alert'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -51,10 +52,15 @@ export function useAlerts(elderlyPersonId?: string) {
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
+    } catch (error) {
       setItems([])
       setTotalItems(0)
-      setError('Não foi possível carregar os alertas.')
+      setError(
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os alertas.',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -85,9 +91,12 @@ export function useAlerts(elderlyPersonId?: string) {
             : item,
         ),
       )
-    } catch {
+    } catch (error) {
       setError(
-        'Não foi possível marcar o alerta como lido.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível marcar o alerta como lido.',
+        ),
       )
     } finally {
       setUpdatingId('')

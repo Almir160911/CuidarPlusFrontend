@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react'
 import { careLogService } from '../services/care-log.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   CareLog,
   CreateCareLogRequest,
@@ -51,12 +52,15 @@ export function useCareLogs(
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
+    } catch (error) {
       setItems([])
       setTotalItems(0)
 
       setError(
-        'Não foi possível carregar o diário de cuidados.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar o diário de cuidados.',
+        ),
       )
     } finally {
       setLoading(false)
@@ -81,14 +85,15 @@ export function useCareLogs(
       await load()
 
       return careLog
-    } catch {
-      setError(
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
         'Não foi possível registrar o cuidado.',
       )
 
-      throw new Error(
-        'Erro ao registrar cuidado.',
-      )
+      setError(message)
+
+      throw new Error(message)
     } finally {
       setSaving(false)
     }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { dailyAgendaService } from '../services/daily-agenda.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type { DailyAgenda } from '../types/daily-agenda'
 
 interface UseDailyAgendaResult {
@@ -18,33 +19,6 @@ interface UseDailyAgendaResult {
     administrationId: string,
     notes?: string,
   ) => Promise<boolean>
-}
-
-function getErrorMessage(error: unknown): string {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'response' in error
-  ) {
-    const responseError = error as {
-      response?: {
-        data?: {
-          message?: string
-        }
-      }
-    }
-
-    return (
-      responseError.response?.data?.message ??
-      'Não foi possível carregar a agenda diária.'
-    )
-  }
-
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  return 'Ocorreu um erro inesperado.'
 }
 
 export function useDailyAgenda(
@@ -75,7 +49,7 @@ export function useDailyAgenda(
       setAgenda(result)
     } catch (loadError) {
       setAgenda(null)
-      setError(getErrorMessage(loadError))
+      setError(getApiErrorMessage(loadError))
     } finally {
       setLoading(false)
     }
@@ -105,7 +79,7 @@ export function useDailyAgenda(
 
         return true
       } catch (updateError) {
-        setError(getErrorMessage(updateError))
+        setError(getApiErrorMessage(updateError))
         return false
       } finally {
         setUpdatingMedicationId(null)
@@ -134,7 +108,7 @@ export function useDailyAgenda(
 
         return true
       } catch (updateError) {
-        setError(getErrorMessage(updateError))
+        setError(getApiErrorMessage(updateError))
         return false
       } finally {
         setUpdatingMedicationId(null)

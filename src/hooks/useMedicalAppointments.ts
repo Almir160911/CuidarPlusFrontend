@@ -5,6 +5,7 @@ import {
   useState,
 } from 'react'
 import { medicalAppointmentService } from '../services/medical-appointment.service'
+import { getApiErrorMessage } from '../utils/api-error'
 import type {
   CreateMedicalAppointmentRequest,
   MedicalAppointment,
@@ -54,11 +55,14 @@ export function useMedicalAppointments(
 
       setItems(result.items)
       setTotalItems(result.totalItems)
-    } catch {
+    } catch (error) {
       setItems([])
       setTotalItems(0)
       setError(
-        'Não foi possível carregar as consultas médicas.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar as consultas médicas.',
+        ),
       )
     } finally {
       setLoading(false)
@@ -83,14 +87,15 @@ export function useMedicalAppointments(
       await load()
 
       return appointment
-    } catch {
-      setError(
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
         'Não foi possível cadastrar a consulta médica.',
       )
 
-      throw new Error(
-        'Erro ao cadastrar consulta médica.',
-      )
+      setError(message)
+
+      throw new Error(message)
     } finally {
       setSaving(false)
     }
@@ -107,9 +112,12 @@ export function useMedicalAppointments(
       setSelected(appointment)
 
       return appointment
-    } catch {
+    } catch (error) {
       setError(
-        'Não foi possível carregar os detalhes da consulta.',
+        getApiErrorMessage(
+          error,
+          'Não foi possível carregar os detalhes da consulta.',
+        ),
       )
 
       return null
