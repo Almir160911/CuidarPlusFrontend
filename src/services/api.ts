@@ -4,9 +4,9 @@ const TOKEN_KEY = 'cuidarplus_token'
 const USER_KEY = 'cuidarplus_user'
 
 export const api = axios.create({
-baseURL:
-  import.meta.env.VITE_API_BASE_URL ??
-  'http://localhost:5184',
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL ??
+    'http://localhost:8080',
 })
 
 api.interceptors.request.use((config) => {
