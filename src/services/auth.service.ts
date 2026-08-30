@@ -7,12 +7,14 @@ export interface LoginRequest {
 }
 
 export interface AuthenticatedUser {
-  id?: string;
-  userId?: string;
-  organizationId?: string;
-  name?: string;
-  email?: string;
-  role?: string;
+  id?: string
+  userId?: string
+  organizationId?: string
+  name?: string
+  fullName?: string
+  email?: string
+  role?: string
+  hasPhoto?: boolean
 }
 
 export interface LoginResult {
@@ -32,6 +34,8 @@ interface LoginResponseData {
   name?: string;
   email?: string;
   role?: string;
+  fullName?: string
+  hasPhoto?: boolean
 }
 
 interface ApiEnvelope<T> {
@@ -96,30 +100,56 @@ function extractToken(data: LoginResponseData): string {
   return token;
 }
 
-function extractUser(data: LoginResponseData): AuthenticatedUser | null {
+function extractUser(
+  data: LoginResponseData,
+): AuthenticatedUser | null {
   if (data.user) {
-    return data.user;
+    return {
+      ...data.user,
+      id:
+        data.user.id ??
+        data.user.userId,
+      userId:
+        data.user.userId ??
+        data.user.id,
+      name:
+        data.user.name ??
+        data.user.fullName,
+      fullName:
+        data.user.fullName ??
+        data.user.name,
+      hasPhoto:
+        data.user.hasPhoto ?? false,
+    }
   }
 
   const hasUserData =
     data.userId ||
     data.organizationId ||
     data.name ||
+    data.fullName ||
     data.email ||
-    data.role;
+    data.role
 
   if (!hasUserData) {
-    return null;
+    return null
   }
+
+  const fullName =
+    data.fullName ?? data.name
 
   return {
     id: data.userId,
     userId: data.userId,
-    organizationId: data.organizationId,
-    name: data.name,
+    organizationId:
+      data.organizationId,
+    name: fullName,
+    fullName,
     email: data.email,
     role: data.role,
-  };
+    hasPhoto:
+      data.hasPhoto ?? false,
+  }
 }
 
 function saveSession(result: LoginResult): void {
@@ -284,7 +314,14 @@ export const authService = {
       return null;
     }
   },
-
+  updateStoredUser(
+    user: AuthenticatedUser,
+  ): void {
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify(user),
+    )
+  },
   isAuthenticated(): boolean {
     return Boolean(localStorage.getItem(TOKEN_KEY));
   },
