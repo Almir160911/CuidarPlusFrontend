@@ -18,6 +18,7 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { LoadingList } from '../../components/ui/LoadingList'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { StatsCard } from '../../components/ui/StatsCard'
+import { DeviceSyncCard } from '../../components/vital-signs/DeviceSyncCard'
 
 function formatDate(
   value: string,
@@ -56,7 +57,9 @@ export function VitalSignsPage() {
         title="Sinais Vitais"
         description="Acompanhe as medições registradas para todos os idosos da organização."
       />
-
+      <DeviceSyncCard
+        onSynchronized={load}
+      />
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           label="Total de registros"
