@@ -24,6 +24,7 @@ import { VitalSignsPage } from '../../pages/VitalSigns/VitalSignsPage'
 import { MyElderlyPage } from '../../pages/MyElderly/MyElderlyPage'
 
 import { authService } from '../../services/auth.service'
+import { ConnectedDevicesPage } from '../../pages/ConnectedDevices/ConnectedDevicesPage'
 
 interface RouteProps {
   children: ReactNode
@@ -165,6 +166,15 @@ export function AppRoutes() {
           element={
             <AdminRoute>
               <VitalSignsPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="dispositivos"
+          element={
+            <AdminRoute>
+              <ConnectedDevicesPage />
             </AdminRoute>
           }
         />
