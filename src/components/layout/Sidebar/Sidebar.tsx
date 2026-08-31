@@ -9,6 +9,7 @@ import {
   Pill,
   Stethoscope,
   Users,
+  Watch,
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
@@ -44,6 +45,11 @@ const adminMenuItems = [
     label: 'Sinais Vitais',
     path: '/sinais-vitais',
     icon: HeartPulse,
+  },
+  {
+    label: 'Dispositivos',
+    path: '/dispositivos',
+    icon: Watch,
   },
   {
     label: 'Consultas',
