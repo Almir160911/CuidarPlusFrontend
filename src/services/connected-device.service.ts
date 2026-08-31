@@ -111,13 +111,13 @@ export const connectedDeviceService = {
     return unwrapApiResponse(response.data)
   },
 
-  async synchronizeMock(
+  async synchronize(
     deviceId: string,
   ): Promise<DeviceSyncResult> {
     const response = await api.post<
       | ApiResponse<DeviceSyncResult>
       | DeviceSyncResult
-    >(`/api/device-sync/mock/${deviceId}`)
+    >(`/api/device-sync/${deviceId}`)
 
     return unwrapApiResponse(response.data)
   },

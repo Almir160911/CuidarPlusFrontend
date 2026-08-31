@@ -47,13 +47,13 @@ export const connectedDeviceTypeLabels:
 export const deviceConnectionStatusLabels:
   Record<DeviceConnectionStatus, string> = {
     [DeviceConnectionStatus.Pending]:
-      'Pendente',
+      'Aguardando sincronização',
     [DeviceConnectionStatus.Connected]:
-      'Conectado',
+      'Sincronizado',
     [DeviceConnectionStatus.Disconnected]:
-      'Desconectado',
+      'Sem sincronização',
     [DeviceConnectionStatus.Error]:
-      'Erro',
+      'Erro na sincronização',
     [DeviceConnectionStatus.Disabled]:
       'Desativado',
   }
