@@ -222,7 +222,7 @@ export function ConnectedDevicesPage() {
     try {
       const result =
         await connectedDeviceService
-          .synchronizeMock(device.id)
+          .synchronize(device.id)
 
       setMessage(
         `Demonstração concluída para ${device.name}: ${result.measurementsImported} medição(ões) importada(s).`,
@@ -246,7 +246,7 @@ export function ConnectedDevicesPage() {
       <PageHeader
         eyebrow="Monitoramento digital"
         title="Dispositivos conectados"
-        description="Cadastre e gerencie os equipamentos vinculados aos idosos."
+        description="Gerencie os equipamentos e acompanhe quando cada um enviou dados pela última vez."
         actions={
           <Button
             type="button"

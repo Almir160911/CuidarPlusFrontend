@@ -101,7 +101,7 @@ export function DeviceSyncCard({
     try {
       const result =
         await connectedDeviceService
-          .synchronizeMock(deviceId)
+          .synchronize(deviceId)
 
       setMessage(
         `Demonstração concluída: ${result.measurementsImported} medição(ões) importada(s).`,
