@@ -3,6 +3,7 @@ import {
   Power,
   PowerOff,
   RefreshCw,
+  Settings2,
   Watch,
 } from 'lucide-react'
 import {
@@ -11,7 +12,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-
+import { useNavigate } from 'react-router-dom'
 import { ConnectedDeviceForm } from '../../components/connected-devices/ConnectedDeviceForm'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
@@ -70,6 +71,7 @@ function getStatusClass(
 }
 
 export function ConnectedDevicesPage() {
+  const navigate = useNavigate()
   const [devices, setDevices] =
     useState<ConnectedDevice[]>([])
 
@@ -390,6 +392,19 @@ export function ConnectedDevicesPage() {
                   )}
 
                   <div className="flex flex-wrap justify-end gap-3">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={isProcessing || isDisabled}
+                      onClick={() =>
+                        navigate(
+                          `/integracao-saude?deviceId=${device.id}`,
+                        )
+                      }
+                    >
+                      <Settings2 size={17} />
+                      Configurar integração
+                    </Button>
                     <Button
                       type="button"
                       variant="secondary"

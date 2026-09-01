@@ -1,6 +1,7 @@
 import {
   Activity,
   AlertTriangle,
+  Cable,
   CalendarDays,
   ClipboardList,
   FileText,
@@ -50,6 +51,11 @@ const adminMenuItems = [
     label: 'Dispositivos',
     path: '/dispositivos',
     icon: Watch,
+  },
+  {
+    label: 'Integração de saúde',
+    path: '/integracao-saude',
+    icon: Cable,
   },
   {
     label: 'Consultas',
