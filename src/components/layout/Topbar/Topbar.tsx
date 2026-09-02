@@ -58,7 +58,13 @@ function getInitials(name: string): string {
   ).toUpperCase()
 }
 
-export function Topbar() {
+interface TopbarProps {
+  onMenuClick: () => void
+}
+
+export function Topbar({
+  onMenuClick,
+}: TopbarProps) {
   const navigate = useNavigate()
   const fileInputRef =
     useRef<HTMLInputElement>(null)
@@ -177,6 +183,8 @@ export function Topbar() {
       <div className="flex items-center gap-3">
         <button
           type="button"
+          onClick={onMenuClick}
+          aria-label="Abrir menu de navegação"
           className="rounded-xl border border-slate-200 p-2 text-slate-600 lg:hidden"
         >
           <Menu size={21} />
