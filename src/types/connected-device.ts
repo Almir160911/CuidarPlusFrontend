@@ -5,6 +5,7 @@ export const ConnectedDeviceType = {
   PulseOximeter: 4,
   Thermometer: 5,
   WeightScale: 6,
+  Smartphone: 7,
   Other: 99,
 } as const
 
@@ -38,6 +39,8 @@ export const connectedDeviceTypeLabels:
       'Oxímetro',
     [ConnectedDeviceType.Thermometer]:
       'Termômetro',
+    [ConnectedDeviceType.Smartphone]:
+      'Celular',
     [ConnectedDeviceType.WeightScale]:
       'Balança',
     [ConnectedDeviceType.Other]:

@@ -1,6 +1,10 @@
 package br.com.cuidarplus.app
 
+import android.content.Intent
+
 import android.os.Build
+import android.provider.Settings
+import java.security.MessageDigest
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -75,6 +79,38 @@ class HealthIntegrationPlugin : Plugin() {
             call = call,
             afterPermissionRequest = false
         )
+    }
+
+    @PluginMethod
+    fun openHealthConnectSettings(
+        call: PluginCall
+    ) {
+        val actions = listOf(
+            "android.health.connect.action.HEALTH_HOME_SETTINGS",
+            "androidx.health.ACTION_HEALTH_CONNECT_SETTINGS"
+        )
+
+        val intent = actions
+            .map { action -> Intent(action) }
+            .firstOrNull { candidate ->
+                candidate.resolveActivity(
+                    context.packageManager
+                ) != null
+            }
+
+        if (intent == null) {
+            call.reject(
+                "Não foi possível abrir o Health Connect."
+            )
+            return
+        }
+
+        intent.addFlags(
+            Intent.FLAG_ACTIVITY_NEW_TASK
+        )
+
+        context.startActivity(intent)
+        call.resolve()
     }
 
     @PluginMethod
@@ -195,9 +231,128 @@ class HealthIntegrationPlugin : Plugin() {
     fun readMeasurements(
         call: PluginCall
     ) {
-        call.reject(
-            "A leitura das medições será habilitada na próxima etapa."
-        )
+        val sinceValue =
+            call.getString("since")
+
+        val untilValue =
+            call.getString("until")
+
+        if (
+            sinceValue.isNullOrBlank() ||
+            untilValue.isNullOrBlank()
+        ) {
+            call.reject(
+                "O período da leitura é obrigatório."
+            )
+            return
+        }
+
+        val since: java.time.Instant
+        val until: java.time.Instant
+
+        try {
+            since =
+                java.time.Instant.parse(
+                    sinceValue
+                )
+
+            until =
+                java.time.Instant.parse(
+                    untilValue
+                )
+        } catch (
+            exception: Exception
+        ) {
+            call.reject(
+                "O período da leitura é inválido.",
+                exception
+            )
+            return
+        }
+
+        if (!until.isAfter(since)) {
+            call.reject(
+                "O final do período deve ser posterior ao início."
+            )
+            return
+        }
+
+        val sdkStatus =
+            HealthConnectClient.getSdkStatus(
+                context
+            )
+
+        if (
+            sdkStatus !=
+            HealthConnectClient.SDK_AVAILABLE
+        ) {
+            call.reject(
+                "O Health Connect não está disponível neste aparelho."
+            )
+            return
+        }
+
+        pluginScope.launch {
+            try {
+                val client =
+                    HealthConnectClient
+                        .getOrCreate(context)
+
+                val grantedPermissions =
+                    client.permissionController
+                        .getGrantedPermissions()
+
+                val grantedHealthPermissions =
+                    grantedPermissions.intersect(
+                        requiredPermissions
+                    )
+
+                if (
+                    grantedHealthPermissions
+                        .isEmpty()
+                ) {
+                    rejectOnMainThread(
+                        call,
+                        "Autorize o acesso aos dados de saúde antes de sincronizar.",
+                        IllegalStateException(
+                            "Nenhuma permissão de saúde foi concedida."
+                        )
+                    )
+                    return@launch
+                }
+
+                val measurements =
+                    HealthConnectMeasurementReader(
+                        client
+                    ).read(
+                        since = since,
+                        until = until,
+                        grantedPermissions =
+                            grantedPermissions
+                    )
+
+                val response =
+                    JSObject().apply {
+                        put(
+                            "measurements",
+                            measurements
+                        )
+                    }
+
+                resolveOnMainThread(
+                    call,
+                    response
+                )
+            } catch (
+                exception: Exception
+            ) {
+                rejectOnMainThread(
+                    call,
+                    "Não foi possível ler os dados do Health Connect.",
+                    exception
+                )
+            }
+        }
     }
 
     private fun resolveCompatibility(
@@ -258,6 +413,9 @@ class HealthIntegrationPlugin : Plugin() {
 
         return JSObject().apply {
             put("platform", "android")
+            put("deviceManufacturer", Build.MANUFACTURER)
+            put("deviceModel", Build.MODEL)
+            put("deviceExternalId", getPrivateDeviceId())
             put(
                 "provider",
                 "health-connect"
@@ -327,6 +485,9 @@ class HealthIntegrationPlugin : Plugin() {
 
         return JSObject().apply {
             put("platform", "android")
+            put("deviceManufacturer", Build.MANUFACTURER)
+            put("deviceModel", Build.MODEL)
+            put("deviceExternalId", getPrivateDeviceId())
             put(
                 "provider",
                 "health-connect"
@@ -351,6 +512,26 @@ class HealthIntegrationPlugin : Plugin() {
             put("message", message)
         }
     }
+
+    private fun getPrivateDeviceId(): String {
+        val androidId = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ANDROID_ID
+        ) ?: "unknown-device"
+
+        val source =
+            "${context.packageName}:$androidId"
+
+        val digest = MessageDigest
+            .getInstance("SHA-256")
+            .digest(source.toByteArray())
+
+        return "android:" + digest
+            .joinToString("") { byte ->
+                "%02x".format(byte)
+            }
+    }
+
 
     private fun getDeviceName(): String {
         val manufacturer =

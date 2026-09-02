@@ -1,3 +1,5 @@
+import type { ConnectedDevice } from './connected-device'
+
 export type HealthPlatform =
   | 'web'
   | 'android'
@@ -22,13 +24,16 @@ export interface HealthCompatibility {
   available: boolean
   permissionStatus: HealthPermissionStatus
   deviceName?: string | null
+  deviceManufacturer?: string | null
+  deviceModel?: string | null
+  deviceExternalId?: string | null
   operatingSystem?: string | null
   message: string
 }
 
 export interface HealthSyncRequest {
   elderlyPersonId: string
-  connectedDeviceId: string
+  connectedDevice: ConnectedDevice
 }
 
 export interface NativeHealthReadRequest {
@@ -51,7 +56,7 @@ export interface NativeHealthReadResult {
 
 export interface ImportHealthMeasurementsResponse {
   syncLogId: string
-  connectedDeviceId: string
+  connectedDevice: ConnectedDevice
   status: string | number
   measurementsReceived: number
   measurementsImported: number
@@ -70,6 +75,9 @@ export interface HealthSyncResult {
 export interface NativeHealthBridge {
   getCompatibility():
     Promise<HealthCompatibility>
+
+  openHealthConnectSettings():
+    Promise<void>
 
   requestHealthPermissions():
     Promise<HealthCompatibility>

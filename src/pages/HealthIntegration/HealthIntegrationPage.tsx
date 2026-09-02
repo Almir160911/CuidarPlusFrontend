@@ -4,6 +4,7 @@ import {
   CircleCheck,
   Monitor,
   RefreshCw,
+  Settings2,
   ShieldCheck,
   Smartphone,
   Watch,
@@ -337,6 +338,23 @@ export function HealthIntegrationPage() {
     }
   }
 
+  async function openHealthConnectSettings() {
+    setError('')
+
+    try {
+      await healthIntegrationService
+        .openHealthConnectSettings()
+    } catch (caughtError) {
+      setError(
+        getApiErrorMessage(
+          caughtError,
+          'Não foi possível abrir o Health Connect.',
+        ),
+      )
+    }
+  }
+
+
   async function requestPermissions() {
     setRequesting(true)
     setMessage('')
@@ -367,7 +385,8 @@ export function HealthIntegrationPage() {
   async function synchronize() {
     if (
       !elderlyPersonId ||
-      !deviceId
+      !deviceId ||
+      !selectedDevice
     ) {
       setError(
         'Selecione a pessoa e o dispositivo.',
@@ -385,13 +404,15 @@ export function HealthIntegrationPage() {
         await healthIntegrationService
           .synchronize({
             elderlyPersonId,
-            connectedDeviceId: deviceId,
+            connectedDevice: selectedDevice,
           })
 
       setSyncResult(result)
 
       setMessage(
-        'Sincronização concluída com sucesso.',
+        result.measurementsReceived === 0
+          ? 'Nenhuma medição foi encontrada no Health Connect.'
+          : 'Sincronização concluída com sucesso.',
       )
 
       await loadData()
@@ -574,18 +595,41 @@ export function HealthIntegrationPage() {
               Verificar compatibilidade
             </Button>
 
+            {nativeAvailable &&
+              compatibility?.provider ===
+                'health-connect' && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() =>
+                    void openHealthConnectSettings()
+                  }
+                >
+                  <Settings2 size={17} />
+                  Abrir Health Connect
+                </Button>
+              )}
+
             <Button
               type="button"
               disabled={
                 requesting ||
+                permissionGranted ||
                 !nativeAvailable
+              }
+              className={
+                permissionGranted
+                  ? 'disabled:border disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-500 disabled:opacity-100'
+                  : ''
               }
               onClick={() =>
                 void requestPermissions()
               }
             >
               <ShieldCheck size={17} />
-              Autorizar dados de saúde
+              {permissionGranted
+                ? 'Dados de saúde autorizados'
+                : 'Autorizar dados de saúde'}
             </Button>
           </div>
         </div>
@@ -715,8 +759,14 @@ export function HealthIntegrationPage() {
               synchronizing ||
               !permissionGranted ||
               !elderlyPersonId ||
-              !deviceId
+              !deviceId ||
+      !selectedDevice
             }
+              className={
+                permissionGranted
+                  ? 'disabled:border disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-500 disabled:opacity-100'
+                  : ''
+              }
             onClick={() =>
               void synchronize()
             }
