@@ -25,6 +25,7 @@ import { MyElderlyPage } from '../../pages/MyElderly/MyElderlyPage'
 
 import { authService } from '../../services/auth.service'
 import { ConnectedDevicesPage } from '../../pages/ConnectedDevices/ConnectedDevicesPage'
+import { HealthIntegrationPage } from '../../pages/HealthIntegration/HealthIntegrationPage'
 
 interface RouteProps {
   children: ReactNode
@@ -175,6 +176,15 @@ export function AppRoutes() {
           element={
             <AdminRoute>
               <ConnectedDevicesPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="integracao-saude"
+          element={
+            <AdminRoute>
+              <HealthIntegrationPage />
             </AdminRoute>
           }
         />
