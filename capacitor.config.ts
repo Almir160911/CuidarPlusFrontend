@@ -8,10 +8,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
 
   server: {
-    androidScheme: 'https',
-
-    // Necessário somente durante o piloto,
-    // pois a API local utiliza HTTP.
+    androidScheme: 'http',
     cleartext: true,
   },
 }

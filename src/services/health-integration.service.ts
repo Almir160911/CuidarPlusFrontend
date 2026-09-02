@@ -1,51 +1,48 @@
+import {
+  Capacitor,
+  registerPlugin,
+} from '@capacitor/core'
+
+import { api } from './api'
+
+import {
+  unwrapApiResponse,
+  type ApiResponse,
+} from '../types/api-response'
+
 import type {
   HealthCompatibility,
   HealthPlatform,
   HealthProvider,
   HealthSyncRequest,
   HealthSyncResult,
+  ImportHealthMeasurementsResponse,
   NativeHealthBridge,
 } from '../types/health-integration'
 
-interface CapacitorRuntime {
-  getPlatform?: () => string
-  isNativePlatform?: () => boolean
-  Plugins?: {
-    HealthIntegration?: NativeHealthBridge
-  }
-}
+const FIRST_SYNC_DAYS = 30
+const SYNC_OVERLAP_MINUTES = 5
+const SYNC_STORAGE_PREFIX =
+  'cuidarplus_health_sync_'
 
-type HealthWindow = Window & {
-  Capacitor?: CapacitorRuntime
-}
-
-function getCapacitorRuntime():
-  CapacitorRuntime | undefined {
-  return (window as HealthWindow).Capacitor
-}
-
-function getNativeBridge():
-  NativeHealthBridge | null {
-  return (
-    getCapacitorRuntime()
-      ?.Plugins
-      ?.HealthIntegration ??
-    null
+const nativeBridge =
+  registerPlugin<NativeHealthBridge>(
+    'HealthIntegration',
   )
-}
 
 function detectPlatform(): HealthPlatform {
-  const capacitorPlatform =
-    getCapacitorRuntime()
-      ?.getPlatform?.()
-      ?.toLowerCase()
+  if (Capacitor.isNativePlatform()) {
+    const platform =
+      Capacitor.getPlatform()
+        .toLowerCase()
 
-  if (capacitorPlatform === 'android') {
-    return 'android'
-  }
+    if (platform === 'android') {
+      return 'android'
+    }
 
-  if (capacitorPlatform === 'ios') {
-    return 'ios'
+    if (platform === 'ios') {
+      return 'ios'
+    }
   }
 
   const userAgent =
@@ -67,10 +64,7 @@ function detectPlatform(): HealthPlatform {
 }
 
 function isNativeApplication(): boolean {
-  return Boolean(
-    getCapacitorRuntime()
-      ?.isNativePlatform?.(),
-  )
+  return Capacitor.isNativePlatform()
 }
 
 function getProvider(
@@ -130,6 +124,81 @@ function createBrowserCompatibility():
   }
 }
 
+function getSyncStorageKey(
+  connectedDeviceId: string,
+): string {
+  return (
+    SYNC_STORAGE_PREFIX +
+    connectedDeviceId
+  )
+}
+
+function getReadPeriod(
+  connectedDeviceId: string,
+): {
+  since: string
+  until: string
+} {
+  const until = new Date()
+  const storedValue =
+    localStorage.getItem(
+      getSyncStorageKey(
+        connectedDeviceId,
+      ),
+    )
+
+  let since: Date
+
+  if (storedValue) {
+    const storedDate =
+      new Date(storedValue)
+
+    if (
+      !Number.isNaN(
+        storedDate.getTime(),
+      )
+    ) {
+      since = new Date(
+        storedDate.getTime() -
+          SYNC_OVERLAP_MINUTES *
+            60 *
+            1000,
+      )
+
+      return {
+        since: since.toISOString(),
+        until: until.toISOString(),
+      }
+    }
+  }
+
+  since = new Date(
+    until.getTime() -
+      FIRST_SYNC_DAYS *
+        24 *
+        60 *
+        60 *
+        1000,
+  )
+
+  return {
+    since: since.toISOString(),
+    until: until.toISOString(),
+  }
+}
+
+function saveSuccessfulSync(
+  connectedDeviceId: string,
+  synchronizedAt: string,
+): void {
+  localStorage.setItem(
+    getSyncStorageKey(
+      connectedDeviceId,
+    ),
+    synchronizedAt,
+  )
+}
+
 export const healthIntegrationService = {
   detectPlatform,
 
@@ -137,39 +206,113 @@ export const healthIntegrationService = {
 
   async getCompatibility():
     Promise<HealthCompatibility> {
-    const bridge = getNativeBridge()
-
-    if (!bridge) {
+    if (!isNativeApplication()) {
       return createBrowserCompatibility()
     }
 
-    return bridge.getCompatibility()
+    return nativeBridge
+      .getCompatibility()
   },
 
   async requestPermissions():
     Promise<HealthCompatibility> {
-    const bridge = getNativeBridge()
-
-    if (!bridge) {
+    if (!isNativeApplication()) {
       throw new Error(
         'As permissões de saúde somente podem ser solicitadas pelo CuidarPlus instalado no celular.',
       )
     }
 
-    return bridge.requestPermissions()
+    return nativeBridge
+      .requestHealthPermissions()
   },
 
   async synchronize(
     request: HealthSyncRequest,
   ): Promise<HealthSyncResult> {
-    const bridge = getNativeBridge()
-
-    if (!bridge) {
+    if (!isNativeApplication()) {
       throw new Error(
         'A sincronização com dados reais requer o CuidarPlus instalado no celular.',
       )
     }
 
-    return bridge.synchronize(request)
+    if (
+      !request.elderlyPersonId ||
+      !request.connectedDeviceId
+    ) {
+      throw new Error(
+        'Selecione a pessoa e o dispositivo antes de sincronizar.',
+      )
+    }
+
+    const readPeriod =
+      getReadPeriod(
+        request.connectedDeviceId,
+      )
+
+    const nativeResult =
+      await nativeBridge
+        .readMeasurements(
+          readPeriod,
+        )
+
+    const measurements =
+      Array.isArray(
+        nativeResult.measurements,
+      )
+        ? nativeResult.measurements
+        : []
+
+    const synchronizedAt =
+      new Date().toISOString()
+
+    if (measurements.length === 0) {
+      saveSuccessfulSync(
+        request.connectedDeviceId,
+        synchronizedAt,
+      )
+
+      return {
+        measurementsReceived: 0,
+        measurementsImported: 0,
+        measurementsIgnored: 0,
+        synchronizedAt,
+      }
+    }
+
+    const response = await api.post<
+      | ApiResponse<
+          ImportHealthMeasurementsResponse
+        >
+      | ImportHealthMeasurementsResponse
+    >(
+      `/api/device-sync/${request.connectedDeviceId}/measurements`,
+      {
+        measurements,
+      },
+    )
+
+    const result =
+      unwrapApiResponse(
+        response.data,
+      )
+
+    const finishedAt =
+      result.finishedAt ??
+      synchronizedAt
+
+    saveSuccessfulSync(
+      request.connectedDeviceId,
+      finishedAt,
+    )
+
+    return {
+      measurementsReceived:
+        result.measurementsReceived,
+      measurementsImported:
+        result.measurementsImported,
+      measurementsIgnored:
+        result.measurementsIgnored,
+      synchronizedAt: finishedAt,
+    }
   },
 }

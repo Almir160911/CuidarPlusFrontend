@@ -31,6 +31,35 @@ export interface HealthSyncRequest {
   connectedDeviceId: string
 }
 
+export interface NativeHealthReadRequest {
+  since: string
+  until: string
+}
+
+export interface NativeHealthMeasurement {
+  type: number
+  value: number
+  unit: string
+  measuredAt: string
+  externalMeasurementId: string
+  metadataJson?: string | null
+}
+
+export interface NativeHealthReadResult {
+  measurements: NativeHealthMeasurement[]
+}
+
+export interface ImportHealthMeasurementsResponse {
+  syncLogId: string
+  connectedDeviceId: string
+  status: string | number
+  measurementsReceived: number
+  measurementsImported: number
+  measurementsIgnored: number
+  startedAt: string
+  finishedAt?: string | null
+}
+
 export interface HealthSyncResult {
   measurementsReceived: number
   measurementsImported: number
@@ -42,10 +71,10 @@ export interface NativeHealthBridge {
   getCompatibility():
     Promise<HealthCompatibility>
 
-  requestPermissions():
+  requestHealthPermissions():
     Promise<HealthCompatibility>
 
-  synchronize(
-    request: HealthSyncRequest,
-  ): Promise<HealthSyncResult>
+  readMeasurements(
+    request: NativeHealthReadRequest,
+  ): Promise<NativeHealthReadResult>
 }
