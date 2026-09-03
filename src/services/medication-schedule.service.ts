@@ -1,6 +1,5 @@
 import { api } from './api'
 import type {
-  ConfirmMedicationScheduleRequest,
   CreateMedicationScheduleRequest,
   MedicationSchedule,
   MedicationScheduleListResult,
@@ -87,30 +86,6 @@ export const medicationScheduleService = {
   ): Promise<MedicationSchedule> {
     const response = await api.post(
       '/api/medication-schedules',
-      payload,
-    )
-
-    return normalizeSchedule(response.data)
-  },
-
-  async confirmTaken(
-    id: string,
-    payload: ConfirmMedicationScheduleRequest,
-  ): Promise<MedicationSchedule> {
-    const response = await api.patch(
-      `/api/medication-schedules/${id}/taken`,
-      payload,
-    )
-
-    return normalizeSchedule(response.data)
-  },
-
-  async confirmNotTaken(
-    id: string,
-    payload: ConfirmMedicationScheduleRequest,
-  ): Promise<MedicationSchedule> {
-    const response = await api.patch(
-      `/api/medication-schedules/${id}/not-taken`,
       payload,
     )
 

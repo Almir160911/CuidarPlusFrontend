@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
 import {
-  Check,
   Clock,
-  Loader2,
   Plus,
   RefreshCw,
-  X,
 } from 'lucide-react'
 import { useMedications } from '../../hooks/useMedications'
 import { useMedicationSchedules } from '../../hooks/useMedicationSchedules'
@@ -48,8 +45,6 @@ export function MedicationSchedulePanel({
     error,
     load,
     create,
-    confirmTaken,
-    confirmNotTaken,
   } = useMedicationSchedules(selectedMedicationId)
 
   useEffect(() => {
@@ -62,61 +57,6 @@ export function MedicationSchedulePanel({
     medications.find(
       (item) => item.id === selectedMedicationId,
     )
-
-  /*
-   * O ID do usuário autenticado ainda não está tipado no
-   * frontend. Usamos o valor armazenado pelo login, quando
-   * estiver disponível.
-   */
-  function getCurrentUserId(): string {
-    const storedUser = localStorage.getItem('cuidarplus_user')
-
-    if (!storedUser) return ''
-
-    try {
-      const user = JSON.parse(storedUser) as Record<
-        string,
-        unknown
-      >
-
-      const id =
-        user.userId ??
-        user.id ??
-        (
-          user.user as Record<string, unknown> | undefined
-        )?.id
-
-      return typeof id === 'string' ? id : ''
-    } catch {
-      return ''
-    }
-  }
-
-  async function handleTaken(scheduleId: string) {
-    const userId = getCurrentUserId()
-
-    if (!userId) {
-      alert(
-        'O identificador do usuário não foi encontrado. Faça login novamente.',
-      )
-      return
-    }
-
-    await confirmTaken(scheduleId, userId)
-  }
-
-  async function handleNotTaken(scheduleId: string) {
-    const userId = getCurrentUserId()
-
-    if (!userId) {
-      alert(
-        'O identificador do usuário não foi encontrado. Faça login novamente.',
-      )
-      return
-    }
-
-    await confirmNotTaken(scheduleId, userId)
-  }
 
   if (medicationsLoading) {
     return <LoadingList rows={5} />
@@ -152,8 +92,8 @@ export function MedicationSchedulePanel({
         </h2>
 
         <p className="mt-2 text-sm text-slate-500">
-          Defina os horários e confirme a administração dos
-          medicamentos.
+          Defina os horários recorrentes. As administrações são
+          confirmadas na Agenda diária.
         </p>
       </div>
 
@@ -243,60 +183,9 @@ export function MedicationSchedulePanel({
                   </p>
                 </div>
 
-                <span
-                  className={[
-                    'rounded-full px-3 py-1 text-xs font-semibold',
-                    schedule.isTaken
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-amber-100 text-amber-700',
-                  ].join(' ')}
-                >
-                  {schedule.isTaken
-                    ? 'Tomado'
-                    : 'Pendente'}
+                <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                  Recorrente
                 </span>
-              </div>
-
-              {schedule.takenAt && (
-                <p className="mt-3 text-xs text-slate-400">
-                  Confirmado em{' '}
-                  {new Date(
-                    schedule.takenAt,
-                  ).toLocaleString('pt-BR')}
-                </p>
-              )}
-
-              <div className="mt-5 flex gap-2">
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() =>
-                    handleTaken(schedule.id)
-                  }
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
-                >
-                  {saving ? (
-                    <Loader2
-                      size={16}
-                      className="animate-spin"
-                    />
-                  ) : (
-                    <Check size={16} />
-                  )}
-                  Tomado
-                </button>
-
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={() =>
-                    handleNotTaken(schedule.id)
-                  }
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
-                >
-                  <X size={16} />
-                  Não tomado
-                </button>
               </div>
             </Card>
           ))}
