@@ -22,9 +22,40 @@ export function VitalSignForm({
   const [temperature, setTemperature] = useState('')
   const [heartRate, setHeartRate] = useState('')
   const [oxygenSaturation, setOxygenSaturation] = useState('')
+  const [error, setError] = useState('')
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setError('')
+
+    if (
+      !bloodPressure.trim() &&
+      !bloodGlucose &&
+      !temperature &&
+      !heartRate &&
+      !oxygenSaturation
+    ) {
+      setError('Informe pelo menos uma medição de sinal vital.')
+      return
+    }
+
+    if (bloodPressure.trim()) {
+      const values = bloodPressure
+        .trim()
+        .split(/[xX/]/)
+        .map((value) => Number(value.trim()))
+
+      if (
+        values.length !== 2 ||
+        values.some((value) => !Number.isFinite(value)) ||
+        values[0] <= values[1]
+      ) {
+        setError(
+          'Informe a pressão com a sistólica maior que a diastólica, por exemplo 120/80.',
+        )
+        return
+      }
+    }
 
     await onSubmit({
       elderlyPersonId,
@@ -40,6 +71,12 @@ export function VitalSignForm({
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+      {error && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 md:col-span-2">
+          {error}
+        </div>
+      )}
+
       <label className="block">
         <span className="mb-1 block text-sm font-medium text-slate-700">
           Pressão arterial
@@ -47,7 +84,7 @@ export function VitalSignForm({
         <input
           value={bloodPressure}
           onChange={(event) => setBloodPressure(event.target.value)}
-          placeholder="Ex.: 12/8"
+          placeholder="Ex.: 12/8 ou 120/80"
           className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
         />
       </label>
