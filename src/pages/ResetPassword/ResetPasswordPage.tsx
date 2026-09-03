@@ -12,6 +12,10 @@ import {
 } from 'lucide-react'
 
 import authService from '../../services/auth.service'
+import {
+  isStrongPassword,
+  PASSWORD_REQUIREMENTS_MESSAGE,
+} from '../../utils/password-policy'
 
 export function ResetPasswordPage() {
   const navigate = useNavigate()
@@ -38,6 +42,11 @@ export function ResetPasswordPage() {
       setError(
         'O link de recuperação é inválido ou está incompleto.',
       )
+      return
+    }
+
+    if (!isStrongPassword(newPassword)) {
+      setError(PASSWORD_REQUIREMENTS_MESSAGE)
       return
     }
 
@@ -136,6 +145,7 @@ export function ResetPasswordPage() {
                 onChange={(event) =>
                   setNewPassword(event.target.value)
                 }
+                maxLength={128}
                 required
                 type="password"
                 value={newPassword}
@@ -158,6 +168,7 @@ export function ResetPasswordPage() {
               onChange={(event) =>
                 setConfirmPassword(event.target.value)
               }
+              maxLength={128}
               required
               type="password"
               value={confirmPassword}
@@ -165,8 +176,8 @@ export function ResetPasswordPage() {
           </div>
 
           <p className="text-xs leading-5 text-slate-500">
-            Use pelo menos 8 caracteres, incluindo
-            maiúscula, minúscula, número e caractere especial.
+            Use entre 8 e 128 caracteres, incluindo
+            maiúscula, minúscula, número e símbolo.
           </p>
 
           {error && (
