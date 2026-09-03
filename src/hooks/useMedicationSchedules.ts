@@ -65,58 +65,6 @@ export function useMedicationSchedules(
     }
   }
 
-  async function confirmTaken(
-    scheduleId: string,
-    registeredByUserId: string,
-  ) {
-    setSaving(true)
-    setError('')
-
-    try {
-      await medicationScheduleService.confirmTaken(
-        scheduleId,
-        { registeredByUserId },
-      )
-
-      await load()
-    } catch (error) {
-      setError(
-        getApiErrorMessage(
-          error,
-          'Não foi possível confirmar o medicamento como tomado.',
-        ),
-      )
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function confirmNotTaken(
-    scheduleId: string,
-    registeredByUserId: string,
-  ) {
-    setSaving(true)
-    setError('')
-
-    try {
-      await medicationScheduleService.confirmNotTaken(
-        scheduleId,
-        { registeredByUserId },
-      )
-
-      await load()
-    } catch (error) {
-      setError(
-        getApiErrorMessage(
-          error,
-          'Não foi possível registrar o medicamento como não tomado.',
-        ),
-      )
-    } finally {
-      setSaving(false)
-    }
-  }
-
   useEffect(() => {
     load()
   }, [load])
@@ -128,7 +76,5 @@ export function useMedicationSchedules(
     error,
     load,
     create,
-    confirmTaken,
-    confirmNotTaken,
   }
 }
