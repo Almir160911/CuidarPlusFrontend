@@ -54,6 +54,19 @@ export function useOrganizationAlerts() {
     useState('')
 
   const load = useCallback(async () => {
+    if (
+      fromDate &&
+      toDate &&
+      fromDate > toDate
+    ) {
+      setItems([])
+      setTotalItems(0)
+      setError(
+        'A data inicial não pode ser posterior à data final.',
+      )
+      return
+    }
+
     setLoading(true)
     setError('')
 

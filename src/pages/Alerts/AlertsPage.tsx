@@ -309,6 +309,7 @@ export function AlertsPage() {
           <input
             type="date"
             value={fromDate}
+            max={toDate || undefined}
             title="Data inicial"
             onChange={(event) =>
               changeFromDate(
@@ -321,6 +322,7 @@ export function AlertsPage() {
           <input
             type="date"
             value={toDate}
+            min={fromDate || undefined}
             title="Data final"
             onChange={(event) =>
               changeToDate(
