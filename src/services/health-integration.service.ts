@@ -305,6 +305,21 @@ function isPhoneMeasurement(
   )
 }
 
+function findPhoneDevice(
+  devices: ConnectedDevice[],
+  externalDeviceId: string,
+): ConnectedDevice | undefined {
+  return devices.find(
+    (device) =>
+      device.provider
+        .trim()
+        .toLowerCase() ===
+        'healthconnect' &&
+      device.externalDeviceId ===
+        externalDeviceId,
+  )
+}
+
 async function getOrCreatePhoneDevice(
   elderlyPersonId: string,
   compatibility: HealthCompatibility,
@@ -329,30 +344,44 @@ async function getOrCreatePhoneDevice(
     await connectedDeviceService
       .listByElderly(elderlyPersonId)
 
-  const existingDevice = devices.find(
-    (device) =>
-      device.provider
-        .toLowerCase() ===
-        'healthconnect' &&
-      device.externalDeviceId ===
-        externalDeviceId,
-  )
+  const existingDevice =
+    findPhoneDevice(
+      devices,
+      externalDeviceId,
+    )
 
   if (existingDevice) {
     return existingDevice
   }
 
-  return connectedDeviceService.create({
-    elderlyPersonId,
-    type: ConnectedDeviceType.Smartphone,
-    name: `Celular ${manufacturer} ${model}`,
-    manufacturer,
-    provider: 'HealthConnect',
-    model,
-    externalDeviceId,
-  })
-}
+  try {
+    return await connectedDeviceService.create({
+      elderlyPersonId,
+      type: ConnectedDeviceType.Smartphone,
+      name: `Celular ${manufacturer} ${model}`,
+      manufacturer,
+      provider: 'HealthConnect',
+      model,
+      externalDeviceId,
+    })
+  } catch (caughtError) {
+    const refreshedDevices =
+      await connectedDeviceService
+        .listByElderly(elderlyPersonId)
 
+    const concurrentlyCreatedDevice =
+      findPhoneDevice(
+        refreshedDevices,
+        externalDeviceId,
+      )
+
+    if (concurrentlyCreatedDevice) {
+      return concurrentlyCreatedDevice
+    }
+
+    throw caughtError
+  }
+}
 
 function describeMeasurementSource(
   measurement: NativeHealthMeasurement,
