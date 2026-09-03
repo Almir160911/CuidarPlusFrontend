@@ -12,6 +12,10 @@ import {
 
 import api from '../../services/api'
 import { getApiErrorMessage } from '../../utils/api-error'
+import {
+  isStrongPassword,
+  PASSWORD_REQUIREMENTS_MESSAGE,
+} from '../../utils/password-policy'
 
 interface RegisterResponse {
   success: boolean
@@ -35,6 +39,11 @@ export function RegisterPage() {
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault()
+
+    if (!isStrongPassword(password)) {
+      setError(PASSWORD_REQUIREMENTS_MESSAGE)
+      return
+    }
 
     if (password !== confirmPassword) {
       setError('As senhas não conferem.')
@@ -148,6 +157,11 @@ export function RegisterPage() {
             value={confirmPassword}
             className={inputClass}
           />
+
+          <p className="text-xs leading-5 text-slate-500">
+            Use entre 8 e 128 caracteres, incluindo
+            maiúscula, minúscula, número e símbolo.
+          </p>
 
           {error && (
             <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
