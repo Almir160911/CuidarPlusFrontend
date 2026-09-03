@@ -45,6 +45,13 @@ export function DocumentUploadForm({
       return
     }
 
+    if (selectedFile.size === 0) {
+      setError('O arquivo selecionado está vazio.')
+      setFile(null)
+      event.target.value = ''
+      return
+    }
+
     const allowedTypes = [
       'application/pdf',
       'image/png',
@@ -173,6 +180,7 @@ export function DocumentUploadForm({
 
         <textarea
           rows={4}
+          maxLength={1000}
           value={description}
           onChange={(event) =>
             setDescription(event.target.value)
