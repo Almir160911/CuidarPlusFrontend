@@ -769,7 +769,9 @@ export function DailyAgendaPanel({
                 htmlFor="medication-administration-notes"
                 className="text-sm font-medium text-slate-700"
               >
-                Observações
+                {confirmation.action === 'not-taken'
+                  ? 'Motivo da não administração *'
+                  : 'Observações'}
               </label>
 
               <textarea
@@ -785,6 +787,14 @@ export function DailyAgendaPanel({
                 className="mt-2 w-full resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
                 disabled={submitting}
               />
+
+              {confirmation.action === 'not-taken' &&
+                !notes.trim() && (
+                  <p className="mt-2 text-sm text-red-600">
+                    Informe o motivo para confirmar que o medicamento
+                    não foi administrado.
+                  </p>
+                )}
             </div>
 
             <div className="flex justify-end gap-2 border-t border-slate-200 px-5 py-4">
@@ -792,7 +802,11 @@ export function DailyAgendaPanel({
                 type="button"
                 className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleCloseConfirmation}
-                disabled={submitting}
+                disabled={
+                  submitting ||
+                  (confirmation.action === 'not-taken' &&
+                    !notes.trim())
+                }
               >
                 Cancelar
               </button>
