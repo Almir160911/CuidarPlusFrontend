@@ -54,6 +54,16 @@ export function CareLogForm({
       return
     }
 
+    if (
+      (form.hadPain || form.hadFall) &&
+      !form.notes.trim()
+    ) {
+      setError(
+        'Descreva nas observações a ocorrência de dor ou queda.',
+      )
+      return
+    }
+
     await onSubmit({
       elderlyPersonId,
       hadMeal: form.hadMeal,
@@ -221,10 +231,13 @@ export function CareLogForm({
       <label className="block md:col-span-2">
         <span className="mb-1 block text-sm font-medium text-slate-700">
           Observações
+          {(form.hadPain || form.hadFall) && ' (obrigatórias)'}
         </span>
 
         <textarea
           rows={5}
+          required={form.hadPain || form.hadFall}
+          maxLength={2000}
           value={form.notes}
           onChange={(event) =>
             setForm((current) => ({

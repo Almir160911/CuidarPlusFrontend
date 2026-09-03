@@ -98,6 +98,7 @@ export function MedicalAppointmentForm({
 
         <input
           required
+          maxLength={150}
           value={form.title}
           onChange={(event) =>
             setForm((current) => ({
@@ -116,6 +117,7 @@ export function MedicalAppointmentForm({
         </span>
 
         <input
+          maxLength={150}
           value={form.doctorName}
           onChange={(event) =>
             setForm((current) => ({
@@ -134,6 +136,7 @@ export function MedicalAppointmentForm({
         </span>
 
         <input
+          maxLength={100}
           value={form.specialty}
           onChange={(event) =>
             setForm((current) => ({
@@ -152,6 +155,7 @@ export function MedicalAppointmentForm({
         </span>
 
         <input
+          maxLength={200}
           required
           type="datetime-local"
           value={form.appointmentDate}
@@ -190,6 +194,7 @@ export function MedicalAppointmentForm({
 
         <textarea
           rows={4}
+          maxLength={2000}
           value={form.notes}
           onChange={(event) =>
             setForm((current) => ({
