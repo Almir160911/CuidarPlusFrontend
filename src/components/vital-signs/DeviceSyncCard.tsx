@@ -59,12 +59,20 @@ export function DeviceSyncCard({
       const result =
         await connectedDeviceService.list()
 
-      setDevices(result.items)
+      const demonstrationDevices =
+        result.items.filter(
+          (device) =>
+            device.provider
+              ?.trim()
+              .toLowerCase() === 'mock',
+        )
+
+      setDevices(demonstrationDevices)
 
       setDeviceId((current) => {
         if (
           current &&
-          result.items.some(
+          demonstrationDevices.some(
             (device) =>
               device.id === current,
           )
@@ -72,7 +80,7 @@ export function DeviceSyncCard({
           return current
         }
 
-        return result.items[0]?.id ?? ''
+        return demonstrationDevices[0]?.id ?? ''
       })
     } catch (caughtError) {
       setError(
@@ -130,6 +138,10 @@ export function DeviceSyncCard({
       (device) =>
         device.id === deviceId,
     ) ?? null
+
+  if (!loadingDevices && devices.length === 0 && !error) {
+    return null
+  }
 
   return (
     <Card className="p-5">

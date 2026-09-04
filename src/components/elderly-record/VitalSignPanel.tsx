@@ -102,7 +102,7 @@ export function VitalSignPanel({
         <EmptyState
           icon={<HeartPulse size={32} />}
           title="Nenhum sinal vital registrado"
-          description="Registre os primeiros sinais vitais deste idoso."
+          description="Registre os primeiros sinais vitais desta pessoa assistida."
         />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">

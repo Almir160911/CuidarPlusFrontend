@@ -77,7 +77,7 @@ export function ConnectedDeviceForm({
 
     if (!form.elderlyPersonId) {
       setValidationError(
-        'Selecione o idoso que utilizará o dispositivo.',
+        'Selecione a pessoa assistida que utilizará o dispositivo.',
       )
       return
     }
@@ -136,13 +136,13 @@ export function ConnectedDeviceForm({
 
       {elderlyPeople.length === 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Cadastre um idoso antes de adicionar um dispositivo.
+          Cadastre uma pessoa assistida antes de adicionar um dispositivo.
         </div>
       )}
 
       <div className="grid gap-5 md:grid-cols-2">
         <label className="text-sm font-medium text-slate-700">
-          Idoso
+          Pessoa assistida
 
           <select
             required
@@ -160,7 +160,7 @@ export function ConnectedDeviceForm({
             className={inputClassName}
           >
             <option value="">
-              Selecione o idoso
+              Selecione a pessoa assistida
             </option>
 
             {elderlyPeople
@@ -177,7 +177,7 @@ export function ConnectedDeviceForm({
                   value={elderly.id}
                 >
                   {elderly.fullName ??
-                    'Idoso sem nome'}
+                    'Pessoa sem nome'}
                 </option>
               ))}
           </select>

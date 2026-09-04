@@ -50,7 +50,7 @@ export function CareLogForm({
     }
 
     if (!form.mood.trim()) {
-      setError('Informe o humor do idoso.')
+      setError('Informe o humor da pessoa assistida.')
       return
     }
 
@@ -92,7 +92,7 @@ export function CareLogForm({
             Alimentação realizada
           </p>
           <p className="text-sm text-slate-500">
-            O idoso realizou a refeição prevista.
+            A pessoa assistida realizou a refeição prevista.
           </p>
         </div>
 

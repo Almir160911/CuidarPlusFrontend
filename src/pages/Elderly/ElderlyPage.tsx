@@ -8,7 +8,10 @@ import { ElderlyToolbar } from '../../components/elderly/ElderlyToolbar'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { StatsCard } from '../../components/ui/StatsCard'
 import { useElderly } from '../../hooks/useElderly'
-import type { CreateElderlyPersonRequest } from '../../types/elderly'
+import type {
+  CreateElderlyPersonRequest,
+  ElderlyPerson,
+} from '../../types/elderly'
 
 export function ElderlyPage() {
   const {
@@ -21,13 +24,35 @@ export function ElderlyPage() {
     setSearch,
     load,
     create,
+    update,
+    setStatus,
   } = useElderly()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState<ElderlyPerson | null>(null)
 
   async function handleCreate(data: CreateElderlyPersonRequest) {
     await create(data)
     setModalOpen(false)
+  }
+
+  async function handleUpdate(data: CreateElderlyPersonRequest) {
+    if (!editing?.id) return
+    await update(editing.id, data)
+    setEditing(null)
+  }
+
+  async function handleStatusChange(item: ElderlyPerson) {
+    if (!item.id) return
+
+    const active = item.isActive !== false
+    const confirmed = window.confirm(
+      active
+        ? `Arquivar ${item.fullName}? Todo o histórico será preservado.`
+        : `Reativar ${item.fullName}?`,
+    )
+
+    if (confirmed) await setStatus(item.id, !active)
   }
 
   const totalWithDoctor = items.filter((item) => item.doctorName).length
@@ -37,8 +62,8 @@ export function ElderlyPage() {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Cadastro"
-        title="Gestão de Idosos"
-        description="Gerencie idosos acompanhados, contatos de emergência, médicos e convênios."
+        title="Pessoas assistidas"
+        description="Gerencie as pessoas acompanhadas, seus contatos de emergência, médicos e convênios."
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -67,12 +92,17 @@ export function ElderlyPage() {
       ) : items.length === 0 ? (
         <ElderlyEmpty />
       ) : (
-        <ElderlyTable items={items} />
+        <ElderlyTable
+          items={items}
+          busy={saving}
+          onEdit={setEditing}
+          onStatusChange={handleStatusChange}
+        />
       )}
 
       <ElderlyModal
         open={modalOpen}
-        title="Novo idoso"
+        title="Nova pessoa assistida"
         description="Cadastre uma pessoa acompanhada pelo Cuidar+."
         onClose={() => setModalOpen(false)}
       >
@@ -80,6 +110,20 @@ export function ElderlyPage() {
           saving={saving}
           onSubmit={handleCreate}
           onCancel={() => setModalOpen(false)}
+        />
+      </ElderlyModal>
+
+      <ElderlyModal
+        open={editing !== null}
+        title="Editar cadastro"
+        description="Atualize os dados sem alterar o histórico de cuidados."
+        onClose={() => setEditing(null)}
+      >
+        <ElderlyForm
+          initialData={editing}
+          saving={saving}
+          onSubmit={handleUpdate}
+          onCancel={() => setEditing(null)}
         />
       </ElderlyModal>
     </div>

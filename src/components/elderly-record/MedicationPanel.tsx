@@ -104,7 +104,7 @@ export function MedicationPanel({
       <MedicationModal
         open={createModalOpen}
         title="Novo medicamento"
-        description="Cadastre um medicamento no prontuário do idoso."
+        description="Cadastre um medicamento no prontuário da pessoa assistida."
         onClose={() => setCreateModalOpen(false)}
       >
         <MedicationForm

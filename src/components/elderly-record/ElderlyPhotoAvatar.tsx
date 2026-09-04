@@ -64,7 +64,7 @@ function getErrorMessage(
       return 'Sua sessão expirou. Faça login novamente.'
 
     case 404:
-      return 'O idoso ou a fotografia não foi encontrado.'
+      return 'A pessoa assistida ou a fotografia não foi encontrada.'
 
     case 413:
       return 'A fotografia ultrapassa o tamanho permitido.'
@@ -168,7 +168,7 @@ export function ElderlyPhotoAvatar({
 
     const consentConfirmed =
       window.confirm(
-        'Confirmo que o idoso ou seu representante foi informado e autorizou o uso desta fotografia para identificação no Cuidar+.',
+        'Confirmo que a pessoa assistida ou seu representante foi informado e autorizou o uso desta fotografia para identificação no Cuidar+.',
       )
 
     if (!consentConfirmed) {
@@ -201,7 +201,7 @@ export function ElderlyPhotoAvatar({
   async function handleDelete() {
     const confirmed =
       window.confirm(
-        'Deseja remover a fotografia do idoso?',
+        'Deseja remover a fotografia da pessoa assistida?',
       )
 
     if (!confirmed) {

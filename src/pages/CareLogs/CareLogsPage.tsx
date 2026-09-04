@@ -76,7 +76,7 @@ export function CareLogsPage() {
       <PageHeader
         eyebrow="Rotina de cuidados"
         title="Diário de Cuidados"
-        description="Acompanhe os registros de cuidados de todos os idosos da organização."
+        description="Acompanhe os registros de cuidados das pessoas assistidas pela organização."
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

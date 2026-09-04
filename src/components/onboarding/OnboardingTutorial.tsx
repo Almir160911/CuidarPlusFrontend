@@ -36,9 +36,9 @@ const adminSteps: TutorialStep[] = [
     icon: HeartPulse,
   },
   {
-    title: 'Cadastre a pessoa cuidada',
+    title: 'Cadastre a pessoa assistida',
     description:
-      'Em Idosos, registre os dados da pessoa que receberá os cuidados. Depois, abra o prontuário para completar o acompanhamento.',
+      'Em Pessoas assistidas, registre os dados de quem receberá os cuidados. Depois, abra o prontuário para completar o acompanhamento.',
     icon: Users,
   },
   {
@@ -50,7 +50,7 @@ const adminSteps: TutorialStep[] = [
   {
     title: 'Acompanhe a rotina',
     description:
-      'Use a agenda para consultas, medicamentos e atividades. Registre cuidados e sinais vitais no prontuário do idoso.',
+      'Use a agenda para consultas, medicamentos e atividades. Registre cuidados e sinais vitais no prontuário da pessoa assistida.',
     icon: CalendarCheck,
   },
   {

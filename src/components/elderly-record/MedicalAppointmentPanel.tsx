@@ -287,7 +287,7 @@ export function MedicalAppointmentPanel({
       <Modal
         open={formOpen}
         title="Nova consulta médica"
-        description="Cadastre uma consulta no prontuário do idoso."
+        description="Cadastre uma consulta no prontuário da pessoa assistida."
         maxWidth="max-w-3xl"
         onClose={() => setFormOpen(false)}
       >

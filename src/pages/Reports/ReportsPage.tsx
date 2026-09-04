@@ -62,7 +62,7 @@ export function ReportsPage() {
         setSelectedId('')
 
         setError(
-          'Não foi possível carregar os idosos.',
+          'Não foi possível carregar as pessoas assistidas.',
         )
       } finally {
         setLoading(false)
@@ -104,7 +104,7 @@ export function ReportsPage() {
               htmlFor="report-elderly"
               className="mb-2 block text-sm font-semibold text-slate-700"
             >
-              Idoso
+              Pessoa assistida
             </label>
 
             <div className="relative">
@@ -129,7 +129,7 @@ export function ReportsPage() {
               >
                 {elderlyPeople.length === 0 ? (
                   <option value="">
-                    Nenhum idoso disponível
+                    Nenhuma pessoa disponível
                   </option>
                 ) : (
                   elderlyPeople.map((item) => (
@@ -172,8 +172,8 @@ export function ReportsPage() {
       ) : elderlyPeople.length === 0 ? (
         <EmptyState
           icon={<FileText size={32} />}
-          title="Nenhum idoso disponível"
-          description="Cadastre um idoso para gerar relatórios de acompanhamento."
+          title="Nenhuma pessoa assistida disponível"
+          description="Cadastre uma pessoa assistida para gerar relatórios de acompanhamento."
         />
       ) : selectedId ? (
         <ReportPanel
