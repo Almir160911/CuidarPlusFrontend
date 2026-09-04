@@ -6,6 +6,7 @@ import {
   ClipboardList,
   FileText,
   HeartPulse,
+  CircleHelp,
   Home,
   Pill,
   Stethoscope,
@@ -78,6 +79,11 @@ const adminMenuItems = [
     path: '/relatorios',
     icon: FileText,
   },
+  {
+    label: 'Ajuda',
+    path: '/ajuda',
+    icon: CircleHelp,
+  },
 ]
 
 const linkedUserMenuItems = [
@@ -90,6 +96,11 @@ const linkedUserMenuItems = [
     label: 'Agendamentos',
     path: '/agendamentos',
     icon: CalendarDays,
+  },
+  {
+    label: 'Ajuda',
+    path: '/ajuda',
+    icon: CircleHelp,
   },
 ]
 

@@ -9,6 +9,7 @@ import {
 
 import { Sidebar } from '../../components/layout/Sidebar/Sidebar'
 import { Topbar } from '../../components/layout/Topbar/Topbar'
+import { OnboardingTutorial } from '../../components/onboarding/OnboardingTutorial'
 
 export function AppLayout() {
   const location = useLocation()
@@ -57,6 +58,8 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      <OnboardingTutorial />
     </div>
   )
 }
