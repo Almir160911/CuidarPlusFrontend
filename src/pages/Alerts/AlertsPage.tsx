@@ -213,7 +213,7 @@ export function AlertsPage() {
       <PageHeader
         eyebrow="Monitoramento"
         title="Centro Global de Alertas"
-        description="Acompanhe alertas clínicos, cuidados e medicamentos de todos os idosos da organização."
+        description="Acompanhe alertas clínicos, cuidados e medicamentos das pessoas assistidas pela organização."
       />
 
       <section className="grid gap-4 sm:grid-cols-3">

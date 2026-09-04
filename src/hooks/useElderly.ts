@@ -5,6 +5,7 @@ import type {
   CreateElderlyPersonRequest,
   ElderlyListResult,
   ElderlyPerson,
+  UpdateElderlyPersonRequest,
 } from '../types/elderly'
 
 export function useElderly() {
@@ -35,7 +36,7 @@ export function useElderly() {
       setError(
         getApiErrorMessage(
           error,
-          'Não foi possível carregar os idosos.',
+          'Não foi possível carregar as pessoas assistidas.',
         ),
       )
       setItems([])
@@ -56,15 +57,58 @@ export function useElderly() {
       setError(
         getApiErrorMessage(
           error,
-          'Não foi possível cadastrar o idoso.',
+          'Não foi possível cadastrar a pessoa assistida.',
         ),
       )
       throw new Error(
         getApiErrorMessage(
           error,
-          'Não foi possível cadastrar o idoso.',
+          'Não foi possível cadastrar a pessoa assistida.',
         ),
       )
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function update(
+    id: string,
+    payload: UpdateElderlyPersonRequest,
+  ) {
+    setSaving(true)
+    setError('')
+
+    try {
+      await elderlyService.update(id, payload)
+      await load()
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
+        'Não foi possível atualizar o cadastro.',
+      )
+      setError(message)
+      throw new Error(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function setStatus(id: string, isActive: boolean) {
+    setSaving(true)
+    setError('')
+
+    try {
+      await elderlyService.setStatus(id, isActive)
+      await load()
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
+        isActive
+          ? 'Não foi possível reativar a pessoa assistida.'
+          : 'Não foi possível arquivar a pessoa assistida.',
+      )
+      setError(message)
+      throw new Error(message)
     } finally {
       setSaving(false)
     }
@@ -90,5 +134,7 @@ export function useElderly() {
     setSelected,
     load,
     create,
+    update,
+    setStatus,
   }
 }

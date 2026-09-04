@@ -147,7 +147,7 @@ export function DashboardPage() {
 
   const cards: DashboardCard[] = [
     {
-      title: 'Idosos cadastrados',
+      title: 'Pessoas assistidas',
       value: dashboard.elderlyPeopleCount,
       description: 'Pessoas acompanhadas',
       icon: Users,
@@ -237,7 +237,7 @@ export function DashboardPage() {
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
-                Registros mais recentes da rotina dos idosos.
+                Registros mais recentes das pessoas assistidas.
               </p>
             </div>
           </div>

@@ -8,13 +8,17 @@ import {
   HeartPulse,
   CircleHelp,
   Home,
+  LogOut,
   Pill,
   Stethoscope,
   Users,
   Watch,
   X,
 } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
+import {
+  NavLink,
+  useNavigate,
+} from 'react-router-dom'
 
 import { authService } from '../../../services/auth.service'
 
@@ -30,7 +34,7 @@ const adminMenuItems = [
     icon: Home,
   },
   {
-    label: 'Idosos',
+    label: 'Pessoas assistidas',
     path: '/idosos',
     icon: Users,
   },
@@ -118,10 +122,18 @@ export function Sidebar({
   mobileOpen,
   onClose,
 }: SidebarProps) {
+  const navigate = useNavigate()
+
   const menuItems =
     isGlobalAdmin()
       ? adminMenuItems
       : linkedUserMenuItems
+
+  function handleLogout() {
+    authService.logout()
+    onClose()
+    navigate('/login')
+  }
 
   return (
     <>
@@ -193,6 +205,17 @@ export function Sidebar({
             )
           })}
         </nav>
+
+        <div className="shrink-0 border-t border-slate-200 p-4">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-700"
+          >
+            <LogOut size={19} />
+            Sair
+          </button>
+        </div>
       </aside>
     </>
   )

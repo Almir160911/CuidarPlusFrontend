@@ -150,7 +150,7 @@ export function DocumentPanel({
       <Modal
         open={uploadModalOpen}
         title="Enviar documento"
-        description="Adicione um arquivo ao prontuário do idoso."
+        description="Adicione um arquivo ao prontuário da pessoa assistida."
         maxWidth="max-w-2xl"
         onClose={() => setUploadModalOpen(false)}
       >

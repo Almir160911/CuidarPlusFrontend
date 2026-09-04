@@ -285,7 +285,7 @@ export function UnifiedCalendarPage() {
       <PageHeader
         eyebrow="Agenda"
         title="Calendário Unificado"
-        description="Acompanhe consultas, exames e administrações de medicamentos de todos os idosos."
+        description="Acompanhe consultas, exames e administrações de medicamentos das pessoas assistidas."
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -397,7 +397,7 @@ export function UnifiedCalendarPage() {
                   event.target.value,
                 )
               }
-              placeholder="Pesquisar idoso, consulta ou medicamento..."
+              placeholder="Pesquisar pessoa, consulta ou medicamento..."
               className="w-full bg-transparent text-sm outline-none"
             />
           </div>

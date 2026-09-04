@@ -476,7 +476,7 @@ export function ElderlyRecordPage() {
     async function loadDashboard() {
       if (!id) {
         setError(
-          'Identificador do idoso não informado.',
+          'Identificador da pessoa assistida não informado.',
         )
         setLoading(false)
         return
@@ -492,7 +492,7 @@ export function ElderlyRecordPage() {
         setDashboard(result)
       } catch {
         setError(
-          'Não foi possível carregar o prontuário do idoso.',
+          'Não foi possível carregar o prontuário da pessoa assistida.',
         )
       } finally {
         setLoading(false)
@@ -607,7 +607,7 @@ export function ElderlyRecordPage() {
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
       >
         <ArrowLeft size={17} />
-        Voltar para idosos
+        Voltar para pessoas assistidas
       </Link>
 
       <Card className="p-6">
@@ -621,7 +621,7 @@ export function ElderlyRecordPage() {
 
           <div className="min-w-0 pt-1">
             <p className="text-sm font-medium text-emerald-700">
-              Prontuário do Idoso
+              Prontuário da Pessoa Assistida
             </p>
 
             <h1 className="mt-1 break-words text-3xl font-bold text-slate-900">

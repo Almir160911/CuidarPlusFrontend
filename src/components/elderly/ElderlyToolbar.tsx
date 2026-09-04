@@ -45,7 +45,7 @@ export function ElderlyToolbar({
           className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
         >
           <Plus size={17} />
-          Novo idoso
+          Nova pessoa
         </button>
       </div>
     </div>

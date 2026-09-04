@@ -5,6 +5,7 @@ import type {
   ElderlyListParams,
   ElderlyListResult,
   ElderlyPerson,
+  UpdateElderlyPersonRequest,
 } from '../types/elderly'
 
 function normalizeListResponse(
@@ -123,5 +124,29 @@ export const elderlyService = {
     return unwrapApiResponse<ElderlyPerson>(
       response.data,
     )
+  },
+
+  async update(
+    id: string,
+    payload: UpdateElderlyPersonRequest,
+  ): Promise<ElderlyPerson> {
+    const response = await api.put(
+      `/api/elderly-people/${id}`,
+      payload,
+    )
+
+    return unwrapApiResponse<ElderlyPerson>(response.data)
+  },
+
+  async setStatus(
+    id: string,
+    isActive: boolean,
+  ): Promise<ElderlyPerson> {
+    const response = await api.patch(
+      `/api/elderly-people/${id}/status`,
+      { isActive },
+    )
+
+    return unwrapApiResponse<ElderlyPerson>(response.data)
   },
 }

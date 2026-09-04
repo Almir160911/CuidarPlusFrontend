@@ -13,6 +13,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -44,6 +45,9 @@ import { getApiErrorMessage } from '../../utils/api-error'
 
 const selectClassName =
   'mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100'
+
+const AUTO_SYNC_MIN_INTERVAL_MS =
+  15 * 60 * 1000
 
 function getPlatformLabel(
   platform: HealthPlatform,
@@ -133,6 +137,10 @@ function formatDate(
 
 export function HealthIntegrationPage() {
   const [searchParams] = useSearchParams()
+
+  const automaticSyncAttempts = useRef(
+    new Set<string>(),
+  )
 
   const [elderlyPeople, setElderlyPeople] =
     useState<ElderlyPerson[]>([])
@@ -382,7 +390,9 @@ export function HealthIntegrationPage() {
     }
   }
 
-  async function synchronize() {
+  const synchronize = useCallback(async (
+    automatic = false,
+  ) => {
     if (
       !elderlyPersonId ||
       !deviceId ||
@@ -411,8 +421,12 @@ export function HealthIntegrationPage() {
 
       setMessage(
         result.measurementsReceived === 0
-          ? 'Nenhuma medição foi encontrada no Health Connect.'
-          : 'Sincronização concluída com sucesso.',
+          ? automatic
+            ? 'Sincronização automática concluída. Nenhuma nova medição foi encontrada.'
+            : 'Nenhuma medição foi encontrada no Health Connect.'
+          : automatic
+            ? 'Sincronização automática concluída com sucesso.'
+            : 'Sincronização concluída com sucesso.',
       )
 
       await loadData()
@@ -426,11 +440,12 @@ export function HealthIntegrationPage() {
     } finally {
       setSynchronizing(false)
     }
-  }
-
-  if (loading) {
-    return <LoadingList />
-  }
+  }, [
+    deviceId,
+    elderlyPersonId,
+    loadData,
+    selectedDevice,
+  ])
 
   const permissionGranted =
     compatibility?.permissionStatus ===
@@ -442,6 +457,66 @@ export function HealthIntegrationPage() {
         ?.nativeApplication &&
       compatibility.available,
     )
+
+  useEffect(() => {
+    if (
+      loading ||
+      synchronizing ||
+      !nativeAvailable ||
+      !permissionGranted ||
+      !elderlyPersonId ||
+      !deviceId ||
+      !selectedDevice
+    ) {
+      return
+    }
+
+    const lastSyncTime =
+      selectedDevice.lastSyncAt
+        ? new Date(
+            selectedDevice.lastSyncAt,
+          ).getTime()
+        : Number.NaN
+
+    const recentlySynchronized =
+      Number.isFinite(lastSyncTime) &&
+      Date.now() - lastSyncTime <
+        AUTO_SYNC_MIN_INTERVAL_MS
+
+    if (recentlySynchronized) {
+      return
+    }
+
+    const attemptKey =
+      `${elderlyPersonId}:${deviceId}`
+
+    if (
+      automaticSyncAttempts.current.has(
+        attemptKey,
+      )
+    ) {
+      return
+    }
+
+    automaticSyncAttempts.current.add(
+      attemptKey,
+    )
+
+    void synchronize(true)
+  }, [
+    deviceId,
+    elderlyPersonId,
+    loading,
+    nativeAvailable,
+    permissionGranted,
+    selectedDevice,
+    synchronize,
+    synchronizing,
+  ])
+
+  if (loading) {
+    return <LoadingList />
+  }
 
   return (
     <div className="space-y-6">
@@ -644,11 +719,18 @@ export function HealthIntegrationPage() {
           <p className="mt-1 text-sm text-slate-500">
             Escolha para quem as medições serão importadas.
           </p>
+
+          {nativeAvailable &&
+            permissionGranted && (
+              <p className="mt-2 text-sm font-medium text-emerald-700">
+                Sincronização automática ativa ao abrir esta área, com intervalo mínimo de 15 minutos.
+              </p>
+            )}
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
           <label className="text-sm font-medium text-slate-700">
-            Pessoa acompanhada
+            Pessoa assistida
 
             <select
               value={elderlyPersonId}
@@ -768,7 +850,7 @@ export function HealthIntegrationPage() {
                   : ''
               }
             onClick={() =>
-              void synchronize()
+              void synchronize(false)
             }
           >
             <RefreshCw

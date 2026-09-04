@@ -227,7 +227,7 @@ export function CareLogPanel({
       <Modal
         open={formOpen}
         title="Novo registro de cuidados"
-        description="Registre as informações da rotina do idoso."
+        description="Registre as informações da rotina da pessoa assistida."
         maxWidth="max-w-4xl"
         onClose={() => setFormOpen(false)}
       >

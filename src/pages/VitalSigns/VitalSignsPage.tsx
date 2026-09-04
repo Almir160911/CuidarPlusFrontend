@@ -55,11 +55,13 @@ export function VitalSignsPage() {
       <PageHeader
         eyebrow="Monitoramento clínico"
         title="Sinais Vitais"
-        description="Acompanhe as medições registradas para todos os idosos da organização."
+        description="Acompanhe as medições registradas para as pessoas assistidas pela organização."
       />
-      <DeviceSyncCard
-        onSynchronized={load}
-      />
+      {import.meta.env.DEV && (
+        <DeviceSyncCard
+          onSynchronized={load}
+        />
+      )}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           label="Total de registros"

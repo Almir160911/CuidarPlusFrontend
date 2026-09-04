@@ -209,7 +209,7 @@ export function MedicalAppointmentsPage() {
       <PageHeader
         eyebrow="Acompanhamento médico"
         title="Consultas Médicas"
-        description="Visualize consultas, exames e documentos médicos de todos os idosos da organização."
+        description="Visualize consultas, exames e documentos médicos das pessoas assistidas pela organização."
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

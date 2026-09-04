@@ -1,7 +1,10 @@
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import type { CreateElderlyPersonRequest } from '../../types/elderly'
+import type {
+  CreateElderlyPersonRequest,
+  ElderlyPerson,
+} from '../../types/elderly'
 
 const initialForm: CreateElderlyPersonRequest = {
   fullName: '',
@@ -24,17 +27,43 @@ function formatLocalDate(date: Date): string {
 
 interface ElderlyFormProps {
   saving?: boolean
+  initialData?: ElderlyPerson | null
   onSubmit: (data: CreateElderlyPersonRequest) => Promise<void>
   onCancel: () => void
 }
 
-export function ElderlyForm({ saving = false, onSubmit, onCancel }: ElderlyFormProps) {
+function toForm(data?: ElderlyPerson | null): CreateElderlyPersonRequest {
+  if (!data) return initialForm
+
+  return {
+    fullName: data.fullName ?? '',
+    birthDate: data.birthDate?.slice(0, 10) ?? '',
+    emergencyContactName: data.emergencyContactName ?? '',
+    emergencyContactPhone: data.emergencyContactPhone ?? '',
+    allergies: data.allergies ?? '',
+    knownDiseases: data.knownDiseases ?? '',
+    doctorName: data.doctorName ?? '',
+    healthInsurance: data.healthInsurance ?? '',
+  }
+}
+
+export function ElderlyForm({
+  saving = false,
+  initialData,
+  onSubmit,
+  onCancel,
+}: ElderlyFormProps) {
   const [form, setForm] = useState<CreateElderlyPersonRequest>(initialForm)
   const [error, setError] = useState('')
 
   const maximumBirthDate = new Date()
   maximumBirthDate.setDate(maximumBirthDate.getDate() - 1)
   const maximumBirthDateValue = formatLocalDate(maximumBirthDate)
+
+  useEffect(() => {
+    setForm(toForm(initialData))
+    setError('')
+  }, [initialData])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

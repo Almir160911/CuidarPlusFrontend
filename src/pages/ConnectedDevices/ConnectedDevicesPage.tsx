@@ -142,7 +142,7 @@ export function ConnectedDevicesPage() {
       if (elderly.id) {
         result[elderly.id] =
           elderly.fullName ??
-          'Idoso sem nome'
+          'Pessoa sem nome'
       }
     })
 
@@ -342,13 +342,13 @@ export function ConnectedDevicesPage() {
                   <dl className="grid gap-3 rounded-2xl bg-slate-50 p-4 text-sm sm:grid-cols-2">
                     <div>
                       <dt className="text-slate-500">
-                        Idoso
+                        Pessoa assistida
                       </dt>
                       <dd className="mt-1 font-medium text-slate-900">
                         {elderlyNames[
                           device.elderlyPersonId
                         ] ??
-                          'Idoso não localizado'}
+                          'Pessoa não localizada'}
                       </dd>
                     </div>
 
@@ -466,7 +466,7 @@ export function ConnectedDevicesPage() {
       <Modal
         open={modalOpen}
         title="Cadastrar dispositivo"
-        description="Associe um equipamento de monitoramento a um idoso."
+        description="Associe um equipamento de monitoramento a uma pessoa assistida."
         maxWidth="max-w-3xl"
         onClose={() => {
           if (!submitting) {

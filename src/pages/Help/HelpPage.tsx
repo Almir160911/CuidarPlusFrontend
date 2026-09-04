@@ -28,7 +28,7 @@ const topics = [
     title: 'Perfis e acesso',
     icon: LockKeyhole,
     items: [
-      'O administrador gerencia a organização, usuários e idosos.',
+      'O administrador gerencia a organização, usuários e pessoas assistidas.',
       'Familiares e cuidadores veem somente as pessoas autorizadas.',
       'Não compartilhe sua senha nem permita que outra pessoa use sua conta.',
     ],
@@ -64,7 +64,7 @@ const topics = [
     title: 'Documentos e relatórios',
     icon: FileHeart,
     items: [
-      'Envie somente documentos relacionados ao cuidado do idoso.',
+      'Envie somente documentos relacionados ao cuidado da pessoa assistida.',
       'Use arquivos permitidos, legíveis e com até 10 MB.',
       'Proteja relatórios baixados, pois podem conter dados pessoais e de saúde.',
     ],

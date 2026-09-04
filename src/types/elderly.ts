@@ -8,6 +8,8 @@ export interface ElderlyPerson {
   knownDiseases?: string
   doctorName?: string
   healthInsurance?: string
+  isActive?: boolean
+  createdAt?: string
 }
 
 export interface CreateElderlyPersonRequest {
@@ -20,6 +22,9 @@ export interface CreateElderlyPersonRequest {
   doctorName?: string
   healthInsurance?: string
 }
+
+export type UpdateElderlyPersonRequest =
+  CreateElderlyPersonRequest
 
 export interface ElderlyListParams {
   page?: number
