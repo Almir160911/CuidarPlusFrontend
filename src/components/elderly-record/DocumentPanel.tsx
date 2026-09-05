@@ -13,6 +13,7 @@ import type {
 } from '../../types/elderly-document'
 import { DocumentTable } from '../documents/DocumentTable'
 import { DocumentUploadForm } from '../documents/DocumentUploadForm'
+import { DocumentViewer } from '../documents/DocumentViewer'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { EmptyState } from '../ui/EmptyState'
@@ -39,11 +40,12 @@ export function DocumentPanel({
     setSelected,
     load,
     upload,
-    openDocument,
   } = useElderlyDocuments(elderlyPersonId)
 
   const [uploadModalOpen, setUploadModalOpen] =
     useState(false)
+  const [viewerDocument, setViewerDocument] =
+    useState<ElderlyDocument | null>(null)
 
   async function handleUpload(
     payload: UploadElderlyDocumentRequest,
@@ -53,7 +55,7 @@ export function DocumentPanel({
   }
 
   function handleOpen(document: ElderlyDocument) {
-    openDocument(document)
+    setViewerDocument(document)
   }
 
   return (
@@ -201,12 +203,22 @@ export function DocumentPanel({
               </p>
             </div>
 
-            <Button onClick={() => openDocument(selected)}>
-              Abrir documento
-            </Button>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button type="button" variant="secondary" onClick={() => setSelected(null)}>
+                Fechar
+              </Button>
+              <Button type="button" onClick={() => setViewerDocument(selected)}>
+                Abrir documento
+              </Button>
+            </div>
           </Card>
         )}
       </Modal>
+
+      <DocumentViewer
+        document={viewerDocument}
+        onClose={() => setViewerDocument(null)}
+      />
     </section>
   )
 }

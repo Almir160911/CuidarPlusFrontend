@@ -122,6 +122,7 @@ export function MedicationsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        showBack
         eyebrow="Tratamentos"
         title="Medicamentos"
         description="Visualize os medicamentos cadastrados para as pessoas assistidas pela organização."

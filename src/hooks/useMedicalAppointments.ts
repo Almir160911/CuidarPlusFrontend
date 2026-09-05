@@ -101,6 +101,42 @@ export function useMedicalAppointments(
     }
   }
 
+  async function update(
+    id: string,
+    payload: CreateMedicalAppointmentRequest,
+  ) {
+    setSaving(true)
+    setError('')
+    try {
+      const appointment = await medicalAppointmentService.update(id, payload)
+      setSelected(appointment)
+      await load()
+      return appointment
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Não foi possível alterar a consulta médica.')
+      setError(message)
+      throw new Error(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function remove(id: string) {
+    setSaving(true)
+    setError('')
+    try {
+      await medicalAppointmentService.remove(id)
+      setSelected(null)
+      await load()
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Não foi possível excluir a consulta médica.')
+      setError(message)
+      throw new Error(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   async function loadDetails(id: string) {
     setDetailsLoading(true)
     setError('')
@@ -209,6 +245,8 @@ export function useMedicalAppointments(
 
     load,
     create,
+    update,
+    remove,
     loadDetails,
   }
 }

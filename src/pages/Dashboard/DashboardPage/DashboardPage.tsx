@@ -7,6 +7,7 @@ import {
   Pill,
   Users,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import { dashboardService } from '../../../services/dashboard.service'
 import type {
@@ -19,6 +20,7 @@ interface DashboardCard {
   value: number
   description: string
   icon: typeof Users
+  path: string
 }
 
 const initialDashboard: GeneralDashboard = {
@@ -151,24 +153,28 @@ export function DashboardPage() {
       value: dashboard.elderlyPeopleCount,
       description: 'Pessoas acompanhadas',
       icon: Users,
+      path: '/idosos',
     },
     {
       title: 'Medicamentos',
       value: dashboard.activeMedications,
       description: 'Tratamentos ativos',
       icon: Pill,
+      path: '/medicamentos',
     },
     {
       title: 'Consultas',
       value: dashboard.upcomingAppointments,
       description: 'Consultas futuras',
       icon: CalendarDays,
+      path: '/consultas',
     },
     {
       title: 'Alertas',
       value: dashboard.unreadAlerts,
       description: 'Alertas não lidos',
       icon: AlertTriangle,
+      path: '/alertas',
     },
   ]
 
@@ -198,12 +204,10 @@ export function DashboardPage() {
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => {
           const Icon = card.icon
+          const canOpen = !loading && card.value > 0
 
-          return (
-            <div
-              key={card.title}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-            >
+          const content = (
+            <>
               <div className="flex items-center justify-between">
                 <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-700">
                   <Icon size={24} />
@@ -218,9 +222,35 @@ export function DashboardPage() {
                 {loading ? '...' : card.value}
               </h2>
 
-              <p className="mt-1 text-sm text-slate-400">
-                {card.description}
-              </p>
+              <div className="mt-1 flex items-center justify-between gap-3">
+                <p className="text-sm text-slate-400">
+                  {card.description}
+                </p>
+
+                {canOpen && (
+                  <span className="shrink-0 text-sm font-semibold text-emerald-700">
+                    Abrir
+                  </span>
+                )}
+              </div>
+            </>
+          )
+
+          return canOpen ? (
+            <Link
+              key={card.title}
+              to={card.path}
+              aria-label={`Abrir ${card.title}: ${card.value}`}
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 active:translate-y-0"
+            >
+              {content}
+            </Link>
+          ) : (
+            <div
+              key={card.title}
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+            >
+              {content}
             </div>
           )
         })}

@@ -27,6 +27,8 @@ import { authService } from '../../services/auth.service'
 import { ConnectedDevicesPage } from '../../pages/ConnectedDevices/ConnectedDevicesPage'
 import { HealthIntegrationPage } from '../../pages/HealthIntegration/HealthIntegrationPage'
 import { HelpPage } from '../../pages/Help/HelpPage'
+import { CareShiftsPage } from '../../pages/CareShifts/CareShiftsPage'
+import { CareNetworkPage } from '../../pages/CareNetwork/CareNetworkPage'
 
 interface RouteProps {
   children: ReactNode
@@ -134,6 +136,16 @@ export function AppRoutes() {
         <Route
           path="agendamentos"
           element={<UnifiedCalendarPage />}
+        />
+
+        <Route
+          path="turnos"
+          element={<CareShiftsPage />}
+        />
+
+        <Route
+          path="rede-de-cuidado"
+          element={<CareNetworkPage />}
         />
 
         <Route

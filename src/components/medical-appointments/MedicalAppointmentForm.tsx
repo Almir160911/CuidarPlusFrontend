@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import type { CreateMedicalAppointmentRequest } from '../../types/medical-appointment'
+import type { CreateMedicalAppointmentRequest, MedicalAppointment } from '../../types/medical-appointment'
 import { Button } from '../ui/Button'
 
 interface MedicalAppointmentFormProps {
@@ -11,6 +11,7 @@ interface MedicalAppointmentFormProps {
     payload: CreateMedicalAppointmentRequest,
   ) => Promise<void>
   onCancel: () => void
+  appointment?: MedicalAppointment | null
 }
 
 interface AppointmentFormState {
@@ -31,14 +32,28 @@ const initialForm: AppointmentFormState = {
   notes: '',
 }
 
+function toLocalDateTime(value: string) {
+  const date = new Date(value)
+  const offset = date.getTimezoneOffset() * 60_000
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16)
+}
+
 export function MedicalAppointmentForm({
   elderlyPersonId,
   saving = false,
   onSubmit,
   onCancel,
+  appointment,
 }: MedicalAppointmentFormProps) {
   const [form, setForm] =
-    useState<AppointmentFormState>(initialForm)
+    useState<AppointmentFormState>(() => appointment ? {
+      title: appointment.title,
+      doctorName: appointment.doctorName ?? '',
+      specialty: appointment.specialty ?? '',
+      appointmentDate: toLocalDateTime(appointment.appointmentDate),
+      location: appointment.location ?? '',
+      notes: appointment.notes ?? '',
+    } : initialForm)
 
   const [error, setError] = useState('')
 
@@ -212,7 +227,7 @@ export function MedicalAppointmentForm({
           {saving && (
             <Loader2 size={18} className="animate-spin" />
           )}
-          Salvar consulta
+          {appointment ? 'Salvar alterações' : 'Salvar consulta'}
         </Button>
 
         <Button

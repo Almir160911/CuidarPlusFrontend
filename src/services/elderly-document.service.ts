@@ -60,6 +60,18 @@ function normalizeList(
 }
 
 export const elderlyDocumentService = {
+  async downloadDocument(id: string, fallbackContentType = 'application/octet-stream') {
+    const response = await api.get(
+      `/api/documents/${id}/file`,
+      { responseType: 'blob' },
+    )
+    const header = response.headers['content-type']
+    const contentType = typeof header === 'string' ? header : fallbackContentType
+    return {
+      blob: new Blob([response.data], { type: contentType }),
+      contentType,
+    }
+  },
   async listByElderly(
     elderlyPersonId: string,
   ): Promise<ElderlyDocumentListResult> {

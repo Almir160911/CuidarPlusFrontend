@@ -3,9 +3,11 @@ import {
   AlertTriangle,
   Cable,
   CalendarDays,
+  CalendarClock,
   ClipboardList,
   FileText,
   HeartPulse,
+  HeartHandshake,
   CircleHelp,
   Home,
   LogOut,
@@ -39,6 +41,11 @@ const adminMenuItems = [
     icon: Users,
   },
   {
+    label: 'Rede de cuidado',
+    path: '/rede-de-cuidado',
+    icon: HeartHandshake,
+  },
+  {
     label: 'Medicamentos',
     path: '/medicamentos',
     icon: Pill,
@@ -52,6 +59,11 @@ const adminMenuItems = [
     label: 'Cuidados',
     path: '/cuidados',
     icon: ClipboardList,
+  },
+  {
+    label: 'Turnos de cuidado',
+    path: '/turnos',
+    icon: CalendarClock,
   },
   {
     label: 'Sinais Vitais',
@@ -91,6 +103,16 @@ const adminMenuItems = [
 ]
 
 const linkedUserMenuItems = [
+  {
+    label: 'Rede de cuidado',
+    path: '/rede-de-cuidado',
+    icon: HeartHandshake,
+  },
+  {
+    label: 'Meus turnos',
+    path: '/turnos',
+    icon: CalendarClock,
+  },
   {
     label: 'Minhas pessoas',
     path: '/minhas-pessoas',

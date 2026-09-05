@@ -56,10 +56,13 @@ export function MedicalAppointmentPanel({
 
     load,
     create,
+    update,
+    remove,
     loadDetails,
   } = useMedicalAppointments(elderlyPersonId)
 
   const [formOpen, setFormOpen] = useState(false)
+  const [editing, setEditing] = useState<MedicalAppointment | null>(null)
 
   async function handleCreate(
     payload: CreateMedicalAppointmentRequest,
@@ -72,6 +75,17 @@ export function MedicalAppointmentPanel({
     appointment: MedicalAppointment,
   ) {
     await loadDetails(appointment.id)
+  }
+
+  async function handleUpdate(payload: CreateMedicalAppointmentRequest) {
+    if (!editing) return
+    await update(editing.id, payload)
+    setEditing(null)
+  }
+
+  async function handleDelete(appointment: MedicalAppointment) {
+    if (!window.confirm(`Excluir a consulta “${appointment.title}”? Esta ação não poderá ser desfeita.`)) return
+    await remove(appointment.id)
   }
 
   function handlePreviousPage() {
@@ -243,6 +257,9 @@ export function MedicalAppointmentPanel({
           <MedicalAppointmentTable
             items={items}
             onView={handleView}
+            onEdit={setEditing}
+            onDelete={(appointment) => void handleDelete(appointment)}
+            disabled={saving}
           />
 
           <Card className="p-4">
@@ -297,6 +314,23 @@ export function MedicalAppointmentPanel({
           onSubmit={handleCreate}
           onCancel={() => setFormOpen(false)}
         />
+      </Modal>
+
+      <Modal
+        open={Boolean(editing)}
+        title="Alterar consulta médica"
+        description="Revise os dados antes de salvar. A pessoa assistida não será alterada."
+        maxWidth="max-w-3xl"
+        onClose={() => setEditing(null)}
+      >
+        {editing && <MedicalAppointmentForm
+          key={editing.id}
+          elderlyPersonId={elderlyPersonId}
+          appointment={editing}
+          saving={saving}
+          onSubmit={handleUpdate}
+          onCancel={() => setEditing(null)}
+        />}
       </Modal>
 
       <Modal

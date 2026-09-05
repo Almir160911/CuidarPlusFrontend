@@ -6,6 +6,8 @@ import {
   Clock,
   ExternalLink,
   Eye,
+  Pencil,
+  Trash2,
   MapPin,
   RefreshCw,
   Search,
@@ -17,6 +19,8 @@ import { useOrganizationMedicalAppointments } from '../../hooks/useOrganizationM
 import type { MedicalAppointment } from '../../types/medical-appointment'
 
 import { MedicalAppointmentDetails } from '../../components/medical-appointments/MedicalAppointmentDetails'
+import { MedicalAppointmentForm } from '../../components/medical-appointments/MedicalAppointmentForm'
+import type { CreateMedicalAppointmentRequest } from '../../types/medical-appointment'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { EmptyState } from '../../components/ui/EmptyState'
@@ -57,11 +61,17 @@ interface AppointmentRowProps {
   onView: (
     appointment: MedicalAppointment,
   ) => void
+  onEdit: (appointment: MedicalAppointment) => void
+  onDelete: (appointment: MedicalAppointment) => void
+  disabled?: boolean
 }
 
 function AppointmentRow({
   appointment,
   onView,
+  onEdit,
+  onDelete,
+  disabled = false,
 }: AppointmentRowProps) {
   const status =
     getStatus(
@@ -145,6 +155,9 @@ function AppointmentRow({
             <ExternalLink size={16} />
             Prontuário
           </Link>
+
+          <button type="button" disabled={disabled} onClick={() => onEdit(appointment)} className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-50"><Pencil size={16} />Alterar</button>
+          <button type="button" disabled={disabled} onClick={() => onDelete(appointment)} className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50"><Trash2 size={16} />Excluir</button>
         </div>
       </td>
     </tr>
@@ -164,6 +177,7 @@ export function MedicalAppointmentsPage() {
     totalPages,
 
     loading,
+    saving,
     error,
 
     setPage,
@@ -171,6 +185,8 @@ export function MedicalAppointmentsPage() {
     changePageSize,
 
     load,
+    update,
+    remove,
   } = useOrganizationMedicalAppointments()
 
   const [
@@ -179,6 +195,7 @@ export function MedicalAppointmentsPage() {
   ] = useState<MedicalAppointment | null>(
     null,
   )
+  const [editingAppointment, setEditingAppointment] = useState<MedicalAppointment | null>(null)
 
   function previousPage() {
     if (page > 1) {
@@ -204,9 +221,22 @@ export function MedicalAppointmentsPage() {
     setSelectedAppointment(null)
   }
 
+  async function handleUpdate(payload: CreateMedicalAppointmentRequest) {
+    if (!editingAppointment) return
+    await update(editingAppointment.id, payload)
+    setEditingAppointment(null)
+  }
+
+  async function handleDelete(appointment: MedicalAppointment) {
+    if (!window.confirm(`Excluir a consulta “${appointment.title}”? Esta ação não poderá ser desfeita.`)) return
+    await remove(appointment.id)
+    if (selectedAppointment?.id === appointment.id) setSelectedAppointment(null)
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
+        showBack
         eyebrow="Acompanhamento médico"
         title="Consultas Médicas"
         description="Visualize consultas, exames e documentos médicos das pessoas assistidas pela organização."
@@ -383,6 +413,9 @@ export function MedicalAppointmentsPage() {
                       onView={
                         handleView
                       }
+                      onEdit={setEditingAppointment}
+                      onDelete={(item) => void handleDelete(item)}
+                      disabled={saving}
                     />
                   ),
                 )}
@@ -443,6 +476,23 @@ export function MedicalAppointmentsPage() {
           </Card>
         </>
       )}
+
+      <Modal
+        open={Boolean(editingAppointment)}
+        title="Alterar consulta médica"
+        description="Revise os dados antes de salvar. A pessoa assistida não será alterada."
+        maxWidth="max-w-3xl"
+        onClose={() => setEditingAppointment(null)}
+      >
+        {editingAppointment && <MedicalAppointmentForm
+          key={editingAppointment.id}
+          elderlyPersonId={editingAppointment.elderlyPersonId}
+          appointment={editingAppointment}
+          saving={saving}
+          onSubmit={handleUpdate}
+          onCancel={() => setEditingAppointment(null)}
+        />}
+      </Modal>
 
       <Modal
         open={Boolean(

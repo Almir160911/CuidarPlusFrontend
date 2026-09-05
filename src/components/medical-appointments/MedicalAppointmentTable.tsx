@@ -1,6 +1,8 @@
 import {
   CalendarDays,
   Eye,
+  Pencil,
+  Trash2,
   MapPin,
   Stethoscope,
 } from 'lucide-react'
@@ -9,6 +11,9 @@ import type { MedicalAppointment } from '../../types/medical-appointment'
 interface MedicalAppointmentTableProps {
   items: MedicalAppointment[]
   onView: (appointment: MedicalAppointment) => void
+  onEdit: (appointment: MedicalAppointment) => void
+  onDelete: (appointment: MedicalAppointment) => void
+  disabled?: boolean
 }
 
 function formatDate(value: string) {
@@ -38,6 +43,9 @@ function getStatus(appointmentDate: string) {
 export function MedicalAppointmentTable({
   items,
   onView,
+  onEdit,
+  onDelete,
+  disabled = false,
 }: MedicalAppointmentTableProps) {
   return (
     <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -139,7 +147,7 @@ export function MedicalAppointmentTable({
                 </td>
 
                 <td className="px-5 py-4">
-                  <button
+                  <div className="flex gap-2"><button
                     type="button"
                     title="Visualizar consulta"
                     onClick={() => onView(appointment)}
@@ -147,6 +155,8 @@ export function MedicalAppointmentTable({
                   >
                     <Eye size={16} />
                   </button>
+                  <button type="button" title="Alterar consulta" disabled={disabled} onClick={() => onEdit(appointment)} className="rounded-xl border border-blue-200 p-2 text-blue-700 hover:bg-blue-50 disabled:opacity-50"><Pencil size={16} /></button>
+                  <button type="button" title="Excluir consulta" disabled={disabled} onClick={() => onDelete(appointment)} className="rounded-xl border border-red-200 p-2 text-red-700 hover:bg-red-50 disabled:opacity-50"><Trash2 size={16} /></button></div>
                 </td>
               </tr>
             )

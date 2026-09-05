@@ -2,8 +2,10 @@ import {
   BellRing,
   BookOpen,
   CalendarDays,
+  CalendarClock,
   FileHeart,
   HeartPulse,
+  HeartHandshake,
   LockKeyhole,
   Pill,
   PlayCircle,
@@ -20,7 +22,7 @@ const topics = [
     icon: Users,
     items: [
       'Crie sua conta informando o nome da família ou organização.',
-      'Cadastre a pessoa idosa e mantenha seus dados atualizados.',
+      'Cadastre a pessoa assistida e mantenha seus dados atualizados.',
       'Abra o prontuário da pessoa para acessar todos os registros de cuidado.',
     ],
   },
@@ -31,6 +33,28 @@ const topics = [
       'O administrador gerencia a organização, usuários e pessoas assistidas.',
       'Familiares e cuidadores veem somente as pessoas autorizadas.',
       'Não compartilhe sua senha nem permita que outra pessoa use sua conta.',
+    ],
+  },
+  {
+    title: 'Rede de cuidado',
+    icon: HeartHandshake,
+    items: [
+      'A página reúne os familiares e cuidadores pertencentes à sua organização.',
+      'Consulte nome, fotografia, função, situação, vínculos autorizados e próximo turno.',
+      'Use a pesquisa para localizar uma pessoa por nome, e-mail ou função.',
+      'O marcador “Você” identifica a conta atualmente conectada.',
+      'Administradores também visualizam participantes inativos; outros perfis veem somente participantes ativos.',
+    ],
+  },
+  {
+    title: 'Turnos de cuidado',
+    icon: CalendarClock,
+    items: [
+      'O administrador agenda o turno informando pessoa assistida, cuidador, início e término previstos.',
+      'Um cuidador não pode possuir turnos com horários sobrepostos.',
+      'O cuidador designado ou um administrador pode iniciar e encerrar o turno.',
+      'No encerramento, registre o resumo do cuidado, eventuais ocorrências e pendências para a próxima pessoa.',
+      'O turno é um registro de organização do cuidado e não substitui um controle formal de ponto.',
     ],
   },
   {
@@ -48,6 +72,8 @@ const topics = [
     items: [
       'Consulte os compromissos no calendário unificado.',
       'Registre consultas com data, horário e orientações relevantes.',
+      'Use Alterar para corrigir uma consulta e Excluir para remover um agendamento lançado por engano.',
+      'Consultas com documentos anexados não podem ser excluídas, protegendo o histórico da pessoa assistida.',
       'Confira sempre a pessoa selecionada antes de salvar um registro.',
     ],
   },
@@ -65,7 +91,8 @@ const topics = [
     icon: FileHeart,
     items: [
       'Envie somente documentos relacionados ao cuidado da pessoa assistida.',
-      'Use arquivos permitidos, legíveis e com até 10 MB.',
+      'São aceitos receita, exame médico, alta hospitalar, identidade, carteira de convênio, termo de consentimento e outros documentos.',
+      'Envie arquivos PDF, PNG, JPG ou JPEG legíveis e com até 10 MB.',
       'Proteja relatórios baixados, pois podem conter dados pessoais e de saúde.',
     ],
   },
@@ -85,6 +112,7 @@ const topics = [
       'A integração está disponível no aplicativo Android compatível.',
       'Autorize somente os tipos de dados que deseja compartilhar.',
       'Confirme a origem e o horário das medições após a sincronização.',
+      'A sincronização depende de dados existentes no Health Connect; o celular sozinho não cria medições clínicas.',
     ],
   },
 ]

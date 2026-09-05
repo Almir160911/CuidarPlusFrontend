@@ -7,7 +7,7 @@ import {
 
 import { medicalAppointmentService } from '../services/medical-appointment.service'
 import { getApiErrorMessage } from '../utils/api-error'
-import type { MedicalAppointment } from '../types/medical-appointment'
+import type { CreateMedicalAppointmentRequest, MedicalAppointment } from '../types/medical-appointment'
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -23,6 +23,8 @@ export function useOrganizationMedicalAppointments() {
     useState(0)
 
   const [loading, setLoading] =
+    useState(false)
+  const [saving, setSaving] =
     useState(false)
   const [error, setError] =
     useState('')
@@ -106,6 +108,36 @@ export function useOrganizationMedicalAppointments() {
     setPage(1)
   }
 
+  async function update(id: string, payload: CreateMedicalAppointmentRequest) {
+    setSaving(true)
+    setError('')
+    try {
+      await medicalAppointmentService.update(id, payload)
+      await load()
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Não foi possível alterar a consulta médica.')
+      setError(message)
+      throw new Error(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function remove(id: string) {
+    setSaving(true)
+    setError('')
+    try {
+      await medicalAppointmentService.remove(id)
+      await load()
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Não foi possível excluir a consulta médica.')
+      setError(message)
+      throw new Error(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return {
     items,
     upcomingAppointments,
@@ -118,6 +150,7 @@ export function useOrganizationMedicalAppointments() {
     totalPages,
 
     loading,
+    saving,
     error,
 
     setPage,
@@ -125,5 +158,7 @@ export function useOrganizationMedicalAppointments() {
     changePageSize,
 
     load,
+    update,
+    remove,
   }
 }

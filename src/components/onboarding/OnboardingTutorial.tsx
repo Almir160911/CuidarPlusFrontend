@@ -1,10 +1,12 @@
 import {
   BellRing,
   CalendarCheck,
+  CalendarClock,
   ChevronLeft,
   ChevronRight,
   FileHeart,
   HeartPulse,
+  HeartHandshake,
   Pill,
   Users,
   Watch,
@@ -42,6 +44,18 @@ const adminSteps: TutorialStep[] = [
     icon: Users,
   },
   {
+    title: 'Monte a rede de cuidado',
+    description:
+      'Cadastre familiares e cuidadores, conceda somente os acessos necessários e consulte todos os participantes em Rede de cuidado.',
+    icon: HeartHandshake,
+  },
+  {
+    title: 'Organize os turnos',
+    description:
+      'Em Turnos de cuidado, escolha a pessoa assistida, o cuidador e o horário. Ao encerrar, registre resumo, ocorrências e pendências para a passagem de turno.',
+    icon: CalendarClock,
+  },
+  {
     title: 'Organize medicamentos',
     description:
       'Cadastre medicamentos e horários. A confirmação de administrado ou não administrado é feita na agenda diária.',
@@ -75,10 +89,22 @@ const linkedUserSteps: TutorialStep[] = [
     icon: HeartPulse,
   },
   {
+    title: 'Conheça sua rede de cuidado',
+    description:
+      'Em Rede de cuidado, consulte familiares, cuidadores, vínculos autorizados e os próximos turnos. Seu perfil aparece identificado como Você.',
+    icon: HeartHandshake,
+  },
+  {
     title: 'Acesse suas pessoas',
     description:
       'Em Minhas pessoas, escolha quem deseja acompanhar e abra o prontuário para consultar os cuidados disponíveis.',
     icon: Users,
+  },
+  {
+    title: 'Acompanhe seus turnos',
+    description:
+      'Em Meus turnos, consulte os horários atribuídos a você. O cuidador designado pode iniciar o turno e registrar a passagem ao encerrar.',
+    icon: CalendarClock,
   },
   {
     title: 'Consulte a agenda',

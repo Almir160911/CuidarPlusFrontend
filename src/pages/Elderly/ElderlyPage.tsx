@@ -61,6 +61,7 @@ export function ElderlyPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        showBack
         eyebrow="Cadastro"
         title="Pessoas assistidas"
         description="Gerencie as pessoas acompanhadas, seus contatos de emergência, médicos e convênios."

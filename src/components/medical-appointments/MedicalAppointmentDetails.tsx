@@ -17,6 +17,7 @@ import type {
 import { elderlyDocumentService } from '../../services/elderly-document.service'
 
 import { DocumentUploadForm } from '../documents/DocumentUploadForm'
+import { DocumentViewer } from '../documents/DocumentViewer'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { EmptyState } from '../ui/EmptyState'
@@ -58,6 +59,8 @@ export function MedicalAppointmentDetails({
     useState(false)
 
   const [selectedDocument, setSelectedDocument] =
+    useState<ElderlyDocument | null>(null)
+  const [viewerDocument, setViewerDocument] =
     useState<ElderlyDocument | null>(null)
 
   const loadDocuments = useCallback(async () => {
@@ -114,17 +117,7 @@ export function MedicalAppointmentDetails({
 async function openDocument(
   document: ElderlyDocument,
 ) {
-  setDocumentsError('')
-
-  try {
-    await elderlyDocumentService.openDocument(
-      document,
-    )
-  } catch {
-    setDocumentsError(
-      'Não foi possível abrir o documento.',
-    )
-  }
+  setViewerDocument(document)
 }
 
   return (
@@ -430,19 +423,29 @@ async function openDocument(
               </p>
             </div>
 
-            <Button
-              type="button"
-              onClick={() =>
-                openDocument(
-                  selectedDocument,
-                )
-              }
-            >
-              Abrir documento
-            </Button>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setSelectedDocument(null)}
+              >
+                Fechar
+              </Button>
+              <Button
+                type="button"
+                onClick={() => openDocument(selectedDocument)}
+              >
+                Abrir documento
+              </Button>
+            </div>
           </Card>
         )}
       </Modal>
+
+      <DocumentViewer
+        document={viewerDocument}
+        onClose={() => setViewerDocument(null)}
+      />
     </div>
   )
 }

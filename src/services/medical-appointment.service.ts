@@ -146,6 +146,22 @@ export const medicalAppointmentService = {
     )
   },
 
+  async update(
+    id: string,
+    payload: CreateMedicalAppointmentRequest,
+  ): Promise<MedicalAppointment> {
+    const { elderlyPersonId: _elderlyPersonId, ...request } = payload
+    const response = await api.put(
+      `/api/medical-appointments/${id}`,
+      request,
+    )
+    return normalizeAppointmentResponse(response.data)
+  },
+
+  async remove(id: string): Promise<void> {
+    await api.delete(`/api/medical-appointments/${id}`)
+  },
+
 async list(
   filters: MedicalAppointmentFilters = {},
 ): Promise<MedicalAppointmentListResult> {

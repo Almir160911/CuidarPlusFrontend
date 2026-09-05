@@ -211,6 +211,7 @@ export function AlertsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        showBack
         eyebrow="Monitoramento"
         title="Centro Global de Alertas"
         description="Acompanhe alertas clínicos, cuidados e medicamentos das pessoas assistidas pela organização."
